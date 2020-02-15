@@ -1,5 +1,9 @@
-<ion-tabs>
+<ion-item lines="full">
+  <ion-icon id="dark-icon" slot="start" name="moon"></ion-icon>
+  <ion-toggle class="ion-no-margin" [(ngModel)]="isDark" slot="start" (ionChange)="toggleDark()"></ion-toggle>
+</ion-item>
 
+<ion-tabs>
   <ion-tab-bar slot="top">
     <ion-tab-button tab="all">
       <ion-icon name="list-circle"></ion-icon>

@@ -7,6 +7,12 @@ import { Component } from '@angular/core';
 })
 export class TabsPage {
 
-  constructor() {}
+  public isDark: boolean;
+  constructor() {
+    this.isDark = true;
+  }
 
+  public toggleDark(): void {
+    document.body.classList.toggle('dark');
+  }
 }

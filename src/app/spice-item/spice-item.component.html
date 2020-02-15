@@ -10,10 +10,14 @@
     </ng-template>
   </ion-item>
   <ion-item-options side="start">
-    <ion-item-option (click)="showEditAlert()">Modifier</ion-item-option>
+    <ion-item-option (click)="showEditAlert()">
+      <ion-icon size="large" name="pencil"></ion-icon>
+    </ion-item-option>
   </ion-item-options>
 
   <ion-item-options side="end">
-    <ion-item-option color="danger" (click)="showDeleteConfirm()">Supprimer</ion-item-option>
+    <ion-item-option color="danger" (click)="showDeleteConfirm()">
+      <ion-icon size="large" name="trash"></ion-icon>
+    </ion-item-option>
   </ion-item-options>
 </ion-item-sliding>
