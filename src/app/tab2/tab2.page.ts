@@ -61,6 +61,7 @@ export class Tab2Page {
         label: "",
         type: 0,
       }
+      this.imageSources = [];
       if (changeView) {
         this.router.navigateByUrl("/tabs/all");
       } else {
