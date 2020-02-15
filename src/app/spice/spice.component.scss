@@ -1,0 +1,27 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 144px;
+    width: 144px;
+    border-radius: 100%;
+    cursor: pointer;
+
+    &:hover {
+        opacity: 80%;
+    }
+
+    p {
+        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        font-weight: 500;
+        text-align: center;
+        margin-bottom: 4px;
+        max-width: 120px;
+    }
+
+    img {
+        width: 60px;
+        border-radius: 100%;
+    }
+}

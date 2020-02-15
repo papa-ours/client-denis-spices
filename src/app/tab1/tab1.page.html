@@ -1,0 +1,31 @@
+<ion-content>
+  <ion-grid fixed *ngIf="spices.length; else noSpices">
+    <ion-row>
+      <ion-col size="2"></ion-col>
+      <ion-col size="8">
+        <ion-list>
+          <ion-list>
+            <app-spice-item *ngFor="let spice of spices" [label]="spice.label" [type]="spice.type" (editEvent)="getSpices()">
+            </app-spice-item>
+          </ion-list>
+        </ion-list>
+      </ion-col>
+      <ion-col size="2"></ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ng-template #noSpices>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title color="danger">
+          Il n'y a aucune épice
+          <ion-button class="ion-float-right" (click)="goToAddView()">
+            <ion-icon name="add-circle"></ion-icon>
+            AJOUTER
+          </ion-button>
+        </ion-title>
+      </ion-toolbar>
+    </ion-header>
+  </ng-template>
+
+</ion-content>

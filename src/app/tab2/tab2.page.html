@@ -1,0 +1,46 @@
+<ion-content>
+  <ion-grid fixed>
+    <ion-row>
+      <ion-col size="3"></ion-col>
+      <ion-col size="6">
+        <form (ngSubmit)="onSubmit()">  
+
+          <ion-list>
+            <ion-item>
+              <ion-label position="stacked">Nom</ion-label>
+              <ion-input name="label" [value]="spice.label" type="text" placeholder="Entrer le nom de l'épice" (ionChange)="updateLabel($event)"></ion-input>
+            </ion-item>
+        
+            <ion-list>
+              <ion-list-header>
+                <ion-label>Type</ion-label>
+              </ion-list-header>
+              <ion-radio-group name="type" [value]="spice.type" (ionChange)="updateType($event)">
+                <ion-item *ngFor="let type of spiceTypes; let ind=index">
+                  <ion-label>{{type.label}}</ion-label>
+                  <ion-radio slot="start" [value]="ind"></ion-radio>
+                </ion-item>
+              </ion-radio-group>
+            </ion-list>
+          </ion-list>
+          <ion-grid fixed>
+            <ion-row>
+              <ion-col size="3">
+                <ion-button color="primary" type="submit">
+                  Continuer
+                </ion-button>
+              </ion-col>
+              <ion-col size="3">
+                <ion-button color="primary" (click)="onSubmit(true)">
+                  Soumettre
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </form>
+      </ion-col>
+      <ion-col size="3"></ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>
