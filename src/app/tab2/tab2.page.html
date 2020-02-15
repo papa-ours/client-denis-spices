@@ -4,11 +4,23 @@
       <ion-col size="3"></ion-col>
       <ion-col size="6">
         <form (ngSubmit)="onSubmit()">  
-
           <ion-list>
             <ion-item>
               <ion-label position="stacked">Nom</ion-label>
               <ion-input name="label" [value]="spice.label" type="text" placeholder="Entrer le nom de l'épice" (ionChange)="updateLabel($event)"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label>Thumbnail</ion-label>
+              <ion-spinner *ngIf="loading" size="sm" name="circular"></ion-spinner>
+              <ion-button (click)="loadImages()" [disabled]="spice.label == ''">
+                <ion-icon slot="start" name="refresh-circle"></ion-icon>
+                Obtenir les images
+              </ion-button>
+            </ion-item>
+            <ion-item>
+              <ion-img *ngFor="let src of imageSources" [src]="src" [class.selected]="src===selectedImage" (click)="selectedImage=src"></ion-img>
+              <ion-label *ngIf="noResults" color="danger">Aucun résultats</ion-label>
             </ion-item>
         
             <ion-list>

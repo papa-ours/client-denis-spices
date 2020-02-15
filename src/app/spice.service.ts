@@ -31,10 +31,14 @@ export class SpiceService {
     });
   }
 
-  public createSpice(spice: any): Observable<void> {
+  public loadImages(label: string): Observable<string[]> {
+    return this.http.get<string[]>(SERVER + 'spice/images/' + label);
+  }
+
+  public createSpice(spice: any, image: string): Observable<void> {
     return this.http.post<void>(
       SERVER + "spice/new",
-      {spice: spice},
+      {spice: spice, image_url: image},
       {headers: new HttpHeaders({'Content-Type': 'application/json'})}
     );
   }

@@ -28,20 +28,20 @@ export class Tab1Page implements OnInit {
 
   private getSpices(): void {
     this.service.getAllSpices().subscribe((spices: Spice[]) => {
+      this.spices = spices;
+      // // Add new spices
+      // for (const spice of spices) {
+      //   if (this.spices.find((s: Spice) => s.label === spice.label) === undefined) {
+      //     this.spices.push(spice);
+      //   }
+      // }
 
-      // Add new spices
-      for (const spice of spices) {
-        if (this.spices.find((s: Spice) => s.label === spice.label) === undefined) {
-          this.spices.push(spice);
-        }
-      }
-
-      // Remove deleted spices
-      for (let i = this.spices.length - 1; i >= 0; i--) {
-        if (spices.find((s: Spice) => s.label === this.spices[i].label) === undefined) {
-          this.spices.splice(i, 1);
-        }
-      }
+      // // Remove deleted spices
+      // for (let i = this.spices.length - 1; i >= 0; i--) {
+      //   if (spices.find((s: Spice) => s.label === this.spices[i].label) === undefined) {
+      //     this.spices.splice(i, 1);
+      //   }
+      // }
 
     });
   }

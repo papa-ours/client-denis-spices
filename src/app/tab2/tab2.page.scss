@@ -1,0 +1,17 @@
+ion-spinner * {
+    width: 8px;
+    height: 8px;
+}
+
+ion-img {
+    width: 60px;
+    margin: 0px 5px 0px 5px;
+    cursor: pointer;
+    &:hover {
+        opacity: 80%;
+    }
+
+    &.selected {
+        border: solid 2px var(--ion-color-primary);
+    }
+}

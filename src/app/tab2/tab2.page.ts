@@ -15,17 +15,25 @@ export class Tab2Page {
 
   public spice: any;
   public spiceTypes: SpiceType[] = SPICE_TYPES;
+  public imageSources: string[];
+  public loading: boolean;
+  public noResults: boolean;
+  public selectedImage: string;
 
   constructor(private toastController: ToastController, private service: SpiceService, private router: Router) {
     this.spice = {
       label: "",
       type: 0,
     }
+    this.imageSources = [];
+    this.loading = false;
+    this.noResults = false;
+    this.selectedImage = "";
   }
 
-  private async showToast(): Promise<void> {
+  private async showToast(message: string): Promise<void> {
     const toast: HTMLIonToastElement = await this.toastController.create({
-      message: 'Le nom ne doit pas être vide',
+      message: message,
       duration: 2200,
       position: 'bottom',
       color: 'danger',
@@ -38,11 +46,16 @@ export class Tab2Page {
 
   public onSubmit(changeView: boolean = false) {
     if (this.spice.label === "") {
-      this.showToast();
+      this.showToast('Le nom ne doit pas être vide');
       return;
     }
 
-    this.service.createSpice(this.spice).subscribe(async () => {
+    if (this.selectedImage === "") {
+      this.showToast('Veuillez sélectionner une image');
+      return;
+    }
+
+    this.service.createSpice(this.spice, this.selectedImage).subscribe(async () => {
       this.service.getAllSpices();
       this.spice = {
         label: "",
@@ -71,5 +84,14 @@ export class Tab2Page {
 
   public updateType($event: CustomEvent) {
     this.spice.type = $event.detail.value;
+  }
+
+  public loadImages(): void {
+    this.loading = true;
+    this.service.loadImages(this.spice.label).subscribe((paths: string[]) => {
+      this.imageSources = paths.filter((path: string) => path !== '');
+      this.noResults = this.imageSources.length === 0;
+      this.loading = false;
+    });
   }
 }
