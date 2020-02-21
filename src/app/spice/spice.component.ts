@@ -45,7 +45,7 @@ export class SpiceComponent implements OnInit, Spice {
         }, {
           text: 'OK',
           handler: (data) => {
-            this.service.updateSpice(this.label, data.label).subscribe(() => this.editEvent.emit());
+            this.service.updateSpice(this.label, data.label, "").subscribe(() => this.editEvent.emit());
           }
         }
       ]
