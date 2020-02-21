@@ -18,8 +18,11 @@
                 Obtenir les images
               </ion-button>
             </ion-item>
-            <ion-item>
-              <ion-img *ngFor="let src of imageSources" [src]="src" [class.selected]="src===selectedImage" (click)="selectedImage=src"></ion-img>
+            <ion-item class="images-container">
+              <div *ngFor="let src of imageSources" class="image-item">
+                <img [src]="src" [class.selected]="src===selectedImage" (click)="selectedImage=src"/>
+                {{parseSourceToImageLabel(src)}}
+              </div>
               <ion-label *ngIf="noResults" color="danger">Aucun résultats</ion-label>
             </ion-item>
         
@@ -27,28 +30,20 @@
               <ion-list-header>
                 <ion-label>Type</ion-label>
               </ion-list-header>
-              <ion-radio-group name="type" [value]="spice.type" (ionChange)="updateType($event)">
-                <ion-item *ngFor="let type of spiceTypes; let ind=index">
+              <ion-radio-group name="type" [value]="spice.type.value" (ionChange)="updateType($event)">
+                <ion-item *ngFor="let type of spiceTypes">
                   <ion-label>{{type.label}}</ion-label>
-                  <ion-radio slot="start" [value]="ind"></ion-radio>
+                  <ion-radio slot="start" [value]="type.value"></ion-radio>
                 </ion-item>
               </ion-radio-group>
             </ion-list>
           </ion-list>
-          <ion-grid fixed>
-            <ion-row>
-              <ion-col size="3">
-                <ion-button color="primary" type="submit">
-                  Continuer
-                </ion-button>
-              </ion-col>
-              <ion-col size="3">
-                <ion-button color="primary" (click)="onSubmit(true)">
-                  Soumettre
-                </ion-button>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
+          <ion-button color="primary" type="submit">
+            Continuer
+          </ion-button>
+          <ion-button color="primary" (click)="onSubmit(true)">
+            Soumettre
+          </ion-button>
         </form>
       </ion-col>
       <ion-col size-md="3" size-sm="1" size-xs="0"></ion-col>

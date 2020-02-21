@@ -1,26 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { SpiceService } from '../spice.service';
 import { Spice } from '../spice';
 import { SPICE_TYPES } from '../spice-types';
 import { SpiceType } from '../spice-type';
-import { ToastController } from '@ionic/angular';
-import { SpiceService } from '../spice.service';
-import { Router } from '@angular/router';
+import { ToastController, ModalController } from '@ionic/angular';
 
 @Component({
-  selector: 'app-tab2',
-  templateUrl: 'tab2.page.html',
-  styleUrls: ['tab2.page.scss']
+  selector: 'app-edit',
+  templateUrl: './edit.component.html',
+  styleUrls: ['./edit.component.scss'],
 })
-export class Tab2Page {
-
-  public spice: Spice;
+export class EditComponent implements OnInit {
+  @Input() public spice: Spice;
+  @Input() public isAdd: boolean;
   public readonly spiceTypes: SpiceType[] = SPICE_TYPES;
   public imageSources: string[];
   public loading: boolean;
   public noResults: boolean;
   public selectedImage: string;
+  private startLabel: string;
 
-  constructor(private toastController: ToastController, private service: SpiceService, private router: Router) {
+  constructor(private toastController: ToastController, private service: SpiceService, private modalCtrl: ModalController) {
     this.spice = {
       label: "",
       type: SPICE_TYPES[0],
@@ -29,6 +29,13 @@ export class Tab2Page {
     this.loading = false;
     this.noResults = false;
     this.selectedImage = "";
+  }
+
+  public ngOnInit(): void {
+    this.startLabel = this.spice.label;
+    if (this.spice.label) {
+      this.loadImages();
+    }
   }
 
   private async showToast(message: string): Promise<void> {
@@ -44,7 +51,7 @@ export class Tab2Page {
     toast.present();
   }
 
-  public onSubmit(changeView: boolean = false) {
+  public onSubmit() {
     this.spice.label = this.spice.label.trim();
     if (this.spice.label === "") {
       this.showToast('Le nom ne doit pas être vide');
@@ -56,32 +63,37 @@ export class Tab2Page {
       return;
     }
 
-    this.service.createSpice(this.spice, this.selectedImage).subscribe(async () => {
-      this.service.getAllSpices();
+    this.isAdd ? this.addSpice() : this.updateSpice();
+  }
+
+  private updateSpice(): void {
+    this.service.updateSpice(this.startLabel, this.spice, this.selectedImage).subscribe(async () => {
       this.spice = {
         label: "",
         type: SPICE_TYPES[0],
       }
       this.imageSources = [];
-      if (changeView) {
-        this.router.navigateByUrl("/tabs/all");
-      } else {
-        const toast: HTMLIonToastElement = await this.toastController.create({
-          message: 'Épice ajoutée',
-          duration: 2200,
-          position: 'bottom',
-          color: 'success',
-          showCloseButton: true,
-          closeButtonText: 'OK',
-        });
-    
-        toast.present();
+      this.dismiss(true);
+    });
+  }
+
+  private addSpice(): void {
+    this.service.createSpice(this.spice, this.selectedImage).subscribe(() => {
+      this.spice = {
+        label: "",
+        type: SPICE_TYPES[0],
       }
+      this.imageSources = [];
+      this.dismiss(true);
     });
   }
 
   public updateLabel($event: CustomEvent) {
     this.spice.label = $event.detail.value;
+  }
+
+  private dismiss(updated: boolean = false): void {
+    this.modalCtrl.dismiss({updated});
   }
 
   public updateType($event: CustomEvent) {
@@ -102,3 +114,4 @@ export class Tab2Page {
     return source.substr(source.lastIndexOf("/") + 1).split("-").join(" ");
   }
 }
+

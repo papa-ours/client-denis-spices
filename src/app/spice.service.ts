@@ -35,10 +35,10 @@ export class SpiceService {
     return this.http.get<string[]>(SERVER + 'spice/images/' + label);
   }
 
-  public createSpice(spice: any, image: string): Observable<void> {
+  public createSpice(spice: Spice, image: string): Observable<void> {
     return this.http.post<void>(
       SERVER + "spice/new",
-      {spice: spice, image_url: image},
+      {spice: {label: spice.label, type: spice.type.value}, image_url: image},
       {headers: new HttpHeaders({'Content-Type': 'application/json'})}
     );
   }
@@ -49,10 +49,10 @@ export class SpiceService {
     );
   }
 
-  public updateSpice(oldLabel: string, newLabel: string): Observable<void> {
+  public updateSpice(oldLabel: string, spice: Spice, image: string): Observable<void> {
     return this.http.put<void>(
       SERVER + "spice/update",
-      {oldLabel, newLabel},
+      {oldLabel: oldLabel, label: spice.label, type: spice.type.value, image: image},
       {headers: new HttpHeaders({'Content-Type': 'application/json'})}
     );
   }

@@ -1,10 +1,15 @@
 #spice-grid {
+    padding: 36px 31.5px;
+    width: fit-content;
     display: grid;
-    grid-template-columns: 146px 146px 146px;
-    grid-template-rows: 146px 146px 146px 146px;
+    margin: auto;
+    grid-template-columns: 144px 144px 144px 144px;
+    grid-template-rows: 120px 120px 120px 120px 120px 120px;
 }
 
-ion-col[size="6"] {
+ion-content {
     display: flex;
+    flex-direction: row;
     justify-content: center;
+    align-content: center;
 }

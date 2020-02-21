@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Spice } from '../spice';
 import { SpiceService } from '../spice.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import * as p5 from 'p5';
+import * as domtoimage from 'dom-to-image-more';
 
 @Component({
   selector: 'app-spice-grid',
@@ -12,42 +14,45 @@ import { filter } from 'rxjs/operators';
 
 export class SpiceGridPage implements OnInit {
   
-  public spices: Spice[];
+  public allSpices: Spice[];
+  public activeSpices: Spice[];
+  @ViewChild("grid", {static: false}) private grid: ElementRef;
 
   constructor(private service: SpiceService, private router: Router) {
-    this.spices = []
+    this.allSpices = [];
+    this.activeSpices = [];
   }
 
   public ngOnInit(): void {
-    this.getSpices();
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
     ).subscribe(
       () => this.getSpices()
     );
+
+    new p5((p5: p5) => {
+      p5.setup = () => {
+        p5.createCanvas(p5.windowWidth, p5.windowHeight);
+      };
+
+      p5.draw = () => {
+        p5.background(255);
+      };
+    });
   }
 
   private getSpices(): void {
     this.service.getAllSpices().subscribe((spices: Spice[]) => {
-
-      // Add new spices
-      for (const spice of spices) {
-        if (this.spices.find((s: Spice) => s.label === spice.label) === undefined) {
-          this.spices.push(spice);
-        }
-      }
-
-      // Remove deleted spices
-      for (let i = this.spices.length - 1; i >= 0; i--) {
-        if (spices.find((s: Spice) => s.label === this.spices[i].label) === undefined) {
-          this.spices.splice(i, 1);
-        }
-      }
-
+      this.allSpices = spices;
+      this.activeSpices = spices.slice(0, 24);
     });
   }
 
   public goToAddView(): void {
     this.router.navigateByUrl("/tabs/new");
+  }
+
+  public exportGrid(): void {
+    domtoimage.toPng(this.grid.nativeElement).then((res: any) => console.log(res));
   }
 }

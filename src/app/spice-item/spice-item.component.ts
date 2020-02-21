@@ -2,9 +2,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { SpiceType } from '../spice-type';
 import { Spice } from '../spice';
 import { SpiceService } from '../spice.service';
-import { AlertController } from '@ionic/angular';
-import { SPICE_TYPES } from '../spice-types';
+import { ModalController, AlertController } from '@ionic/angular';
 import { first } from 'rxjs/operators';
+import { EditComponent } from '../edit/edit.component';
 
 @Component({
   selector: 'app-spice-item',
@@ -18,7 +18,7 @@ export class SpiceItemComponent implements OnInit, Spice {
   @Output() public editEvent: EventEmitter<void>;
   public imageSource: string;
 
-  public constructor(private service: SpiceService, private alertCtrl: AlertController) {
+  public constructor(private service: SpiceService, private alertCtrl: AlertController, private modalCtrl: ModalController) {
     this.imageSource = "-1";
     this.editEvent = new EventEmitter<void>();
   }
@@ -27,27 +27,27 @@ export class SpiceItemComponent implements OnInit, Spice {
     this.service.getImageForSpice(this.label).pipe(first()).subscribe((source: string) => this.imageSource = source);
   }
 
-  public async showEditAlert(): Promise<void> {
-    const alert = await this.alertCtrl.create({
-      header: 'Modifier',
-      subHeader: this.label + ' (' + this.type.label + ')',
-      inputs: [{
-        name: 'label',
-        type: 'text',
-        value: this.label,
-      }],
-      buttons: [
-        {
-          text: 'Annuler',
-        }, {
-          text: 'OK',
-          handler: (data) => {
-            this.service.updateSpice(this.label, data.label).subscribe(() => this.editEvent.emit());
-          }
-        }
-      ]
+  public async showEditModal(): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: EditComponent,
+      componentProps: {
+        isAdd: false,
+        spice: this.asSpice(),
+      },
+      cssClass: 'custom-modal',
     });
-    await alert.present();
+    modal.present();
+    const {data} = await modal.onDidDismiss();
+    if (data.updated) {
+      this.editEvent.emit();
+    }
+  }
+
+  private asSpice(): Spice {
+    return {
+      label: this.label,
+      type: this.type,
+    };
   }
 
   public async showDeleteConfirm(): Promise<void> {

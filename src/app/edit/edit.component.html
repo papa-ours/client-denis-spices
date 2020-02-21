@@ -1,0 +1,46 @@
+<ion-content>
+  <form (ngSubmit)="onSubmit()">  
+    <ion-list>
+      <ion-item>
+        <ion-label position="stacked">Nom</ion-label>
+        <ion-input name="label" [value]="spice.label" type="text" placeholder="Entrer le nom de l'épice" (ionChange)="updateLabel($event)"></ion-input>
+      </ion-item>
+      
+      <ion-item>
+        <ion-label>Image</ion-label>
+        <ion-spinner *ngIf="loading" size="sm" name="circular"></ion-spinner>
+        <ion-button (click)="loadImages()" [disabled]="spice.label == ''">
+          <ion-icon slot="start" name="refresh-circle"></ion-icon>
+          Obtenir les images
+        </ion-button>
+      </ion-item>
+      <ion-item class="images-container">
+        <div *ngFor="let src of imageSources; let ind=index" class="image-item" [style.left.px]="ind * 80">
+          <img [src]="src" [class.selected]="src===selectedImage" (click)="selectedImage=src"/>
+          <p>
+            {{parseSourceToImageLabel(src)}}
+          </p>
+        </div>
+        <ion-label *ngIf="noResults" color="danger">Aucun résultats</ion-label>
+      </ion-item>
+      
+      <ion-list>
+        <ion-list-header>
+          <ion-label>Type</ion-label>
+        </ion-list-header>
+        <ion-radio-group name="type" [value]="spice.type.value" (ionChange)="updateType($event)">
+          <ion-item *ngFor="let type of spiceTypes">
+            <ion-label>{{type.label}}</ion-label>
+            <ion-radio slot="start" [value]="type.value"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
+      </ion-list>
+      <ion-button float-right color="primary" type="submit">
+        OK
+      </ion-button>
+      <ion-button float-right fill="clear" color="danger" (click)="dismiss()">
+        Annuler
+      </ion-button>
+    </ion-list>
+  </form>
+</ion-content>  

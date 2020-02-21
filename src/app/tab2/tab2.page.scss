@@ -3,9 +3,9 @@ ion-spinner * {
     height: 8px;
 }
 
-ion-img {
+img {
     width: 60px;
-    margin: 0px 5px 0px 5px;
+    margin: auto;
     cursor: pointer;
     &:hover {
         opacity: 80%;
@@ -13,5 +13,21 @@ ion-img {
 
     &.selected {
         border: solid 2px var(--ion-color-primary);
+        border-style: inset;
     }
+}
+
+.images-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.image-item {
+    display: flex;
+    font-size: 14px;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
 }

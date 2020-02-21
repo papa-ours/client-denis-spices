@@ -4,7 +4,7 @@
       {{label}}
     </p>
   </ion-text>
-  <img *ngIf="imageSource != '-1'; else loader" src={{imageSource}}/>
+  <img *ngIf="imageSource != '-1'; else loader" src={{imageSource}} />
   <ng-template #loader>
     <ion-spinner name="circular"></ion-spinner>
   </ng-template>

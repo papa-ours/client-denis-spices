@@ -3,6 +3,9 @@ import { Spice } from '../spice';
 import { SpiceService } from '../spice.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { SPICE_TYPES } from '../spice-types';
+import { EditComponent } from '../edit/edit.component';
+import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tab1',
@@ -11,10 +14,14 @@ import { filter } from 'rxjs/operators';
 })
 export class Tab1Page implements OnInit {
 
+  public sortColumn: string;
+  public sortDirection: number;
   public spices: Spice[];
 
-  constructor(private service: SpiceService, private router: Router) {
-    this.spices = []
+  constructor(private service: SpiceService, private router: Router, private modalCtrl: ModalController) {
+    this.spices = [];
+    this.sortColumn = "label";
+    this.sortDirection = 1;
   }
 
   public ngOnInit(): void {
@@ -26,23 +33,48 @@ export class Tab1Page implements OnInit {
     );
   }
 
+  public setSort(column: string): void {
+    this.sortColumn = column;
+    this.sortDirection = this.sortDirection === -1 ? 1 : -1;
+    this.sortSpices();
+  }
+
+  private sortSpices(): void {
+    this.spices.sort((spice1: Spice, spice2: Spice) => {
+      const val1: string = (this.sortColumn === 'label' ? spice1.label : spice1.type.label).replace('É', 'E');
+      const val2: string = (this.sortColumn === 'label' ? spice2.label : spice2.type.label).replace('É', 'E');
+
+      if (this.sortDirection === -1) {
+        return val1 < val2 ? 1 : -1;
+      } else {
+        return val1 < val2 ? -1 : 1 ;
+      }
+    });
+  }
+
+  public async addSpice(): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: EditComponent,
+      componentProps: {
+        isAdd: true,
+        spice: {
+          label: "",
+          type: SPICE_TYPES[0],
+        },
+      },
+      cssClass: 'custom-modal',
+    });
+    modal.present();
+    const {data} = await modal.onDidDismiss();
+    if (data.updated) {
+      this.getSpices();
+    }
+  }
+
   private getSpices(): void {
     this.service.getAllSpices().subscribe((spices: Spice[]) => {
       this.spices = spices;
-      // // Add new spices
-      // for (const spice of spices) {
-      //   if (this.spices.find((s: Spice) => s.label === spice.label) === undefined) {
-      //     this.spices.push(spice);
-      //   }
-      // }
-
-      // // Remove deleted spices
-      // for (let i = this.spices.length - 1; i >= 0; i--) {
-      //   if (spices.find((s: Spice) => s.label === this.spices[i].label) === undefined) {
-      //     this.spices.splice(i, 1);
-      //   }
-      // }
-
+      this.sortSpices();
     });
   }
 
