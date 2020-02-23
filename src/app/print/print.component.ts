@@ -3,7 +3,7 @@ import * as p5 from 'p5';
 import { Spice } from '../spice';
 import { SERVER } from '../server';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { ModalController } from '@ionic/angular';
+import { ModalController, Platform } from '@ionic/angular';
 
 interface Preview {
   safeUrl: SafeUrl;
@@ -35,10 +35,12 @@ export class PrintComponent implements OnInit {
   private p5: p5;
   public previewData: Preview[];
   public currentPage: number;
+  public qualityWarning: boolean;
   
   constructor(
     private sanitizer: DomSanitizer,
     private modalController: ModalController,
+    private platform: Platform,
   ) {
     this.spices = [];
     this.ready = false;
@@ -56,11 +58,19 @@ export class PrintComponent implements OnInit {
     this.loading = false;
     this.currentPage = 0;
     this.previewData = [];
+    this.qualityWarning = false;
   }
 
   ngOnInit() {
     this.p5 = new p5((p5: p5) => this.sketch(p5), document.getElementById("preview-canvas"));
-    // this.p5.pixelDensity(6);
+
+    this.platform.ready().then(() => {
+      if (this.platform.is("desktop")) {
+        this.p5.pixelDensity(6);
+      } else {
+        this.qualityWarning = true;
+      }
+    });
     this.getMask();
   }
 

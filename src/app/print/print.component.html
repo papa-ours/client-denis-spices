@@ -17,6 +17,13 @@
 
 <ion-content>
   <ion-list *ngIf="!ready; else preview">
+    <ion-item *ngIf="qualityWarning" color="danger">
+      <ion-icon slot="start" name="alert-circle"></ion-icon>
+      <ion-label>La qualité du résultat sera meilleure sur un ordinateur.</ion-label>
+      <ion-button slot="end" (click)="qualityWarning=false" fill="clear" color="dark">
+        OK
+      </ion-button>
+    </ion-item>
     <ion-item>
       <ion-label>Commencer à partir de: </ion-label>
       <ion-input type="number" [max]="max - 1" min="0" [(ngModel)]="indexOffset"></ion-input>
