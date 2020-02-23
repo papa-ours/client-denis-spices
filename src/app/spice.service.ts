@@ -4,17 +4,18 @@ import { Spice } from './spice';
 import { Observable } from 'rxjs';
 import { SERVER } from './server';
 import { SPICE_TYPES } from './spice-types';
+import { FilterService } from './filter.service';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class SpiceService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private filterService: FilterService) { }
 
-  public getAllSpices(): Observable<Spice[]> {
+  public getSpices(): Observable<Spice[]> {
     return new Observable<Spice[]>(subscriber => {
-      this.http.get<any[]>(SERVER + "spice/all").subscribe(response => {
+      this.http.get<any[]>(`${SERVER}/spice${this.filterService.encodedQuery}`).subscribe(response => {
         const spices: Spice[] = response.map((val: any) => {
           return {label: val.label, type: SPICE_TYPES[val.type]}
         });

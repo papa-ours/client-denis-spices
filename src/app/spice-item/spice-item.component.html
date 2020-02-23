@@ -1,12 +1,13 @@
 <ion-item-sliding>
   <ion-item>
+    <ion-checkbox slot="start" [checked]="selected"></ion-checkbox>
     <ion-label>{{label}}</ion-label>
     <ion-label>{{type.label}}</ion-label>
     <ion-thumbnail *ngIf="imageSource !== '-1'; else loader" slot="end">
       <img src={{imageSource}}/>
     </ion-thumbnail>
     <ng-template #loader>
-      <ion-spinner name="circular"></ion-spinner>
+      <ion-spinner name="lines-small"></ion-spinner>
     </ng-template>
   </ion-item>
   <ion-item-options side="start">

@@ -3,7 +3,7 @@ import { SpiceService } from '../spice.service';
 import { Spice } from '../spice';
 import { SPICE_TYPES } from '../spice-types';
 import { SpiceType } from '../spice-type';
-import { ToastController, ModalController } from '@ionic/angular';
+import { ToastController, ModalController, AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-edit',
@@ -20,7 +20,7 @@ export class EditComponent implements OnInit {
   public selectedImage: string;
   private startLabel: string;
 
-  constructor(private toastController: ToastController, private service: SpiceService, private modalCtrl: ModalController) {
+  constructor(private toastController: ToastController, private service: SpiceService, private modalCtrl: ModalController, private alertController: AlertController) {
     this.spice = {
       label: "",
       type: SPICE_TYPES[0],
@@ -35,7 +35,12 @@ export class EditComponent implements OnInit {
     this.startLabel = this.spice.label;
     if (this.spice.label) {
       this.loadImages();
+      this.getCurrentImage();
     }
+  }
+
+  private getCurrentImage(): void {
+    this.service.getImageForSpice(this.spice.label).subscribe((imageSource: string) => this.selectedImage = imageSource);
   }
 
   private async showToast(message: string): Promise<void> {
@@ -92,7 +97,17 @@ export class EditComponent implements OnInit {
     this.spice.label = $event.detail.value;
   }
 
-  private dismiss(updated: boolean = false): void {
+  public async showImageAlert(source: string): Promise<void> {
+    const alert = await this.alertController.create({
+      message: '<img src="' + source + '"/>',
+      buttons: [
+        'OK',
+      ],
+    });
+    alert.present();
+  }
+
+  public dismiss(updated: boolean = false): void {
     this.modalCtrl.dismiss({updated});
   }
 

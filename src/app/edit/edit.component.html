@@ -1,3 +1,8 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{isAdd ? 'Ajouter' : 'Modifier'}}</ion-title>
+  </ion-toolbar>
+</ion-header>
 <ion-content>
   <form (ngSubmit)="onSubmit()">  
     <ion-list>
@@ -8,7 +13,7 @@
       
       <ion-item>
         <ion-label>Image</ion-label>
-        <ion-spinner *ngIf="loading" size="sm" name="circular"></ion-spinner>
+        <ion-spinner *ngIf="loading" size="sm" name="lines-small"></ion-spinner>
         <ion-button (click)="loadImages()" [disabled]="spice.label == ''">
           <ion-icon slot="start" name="refresh-circle"></ion-icon>
           Obtenir les images
@@ -17,7 +22,7 @@
       <ion-item class="images-container">
         <div *ngFor="let src of imageSources; let ind=index" class="image-item" [style.left.px]="ind * 80">
           <img [src]="src" [class.selected]="src===selectedImage" (click)="selectedImage=src"/>
-          <p>
+          <p (click)="showImageAlert(src)" class="image-label">
             {{parseSourceToImageLabel(src)}}
           </p>
         </div>
@@ -35,12 +40,16 @@
           </ion-item>
         </ion-radio-group>
       </ion-list>
-      <ion-button float-right color="primary" type="submit">
-        OK
-      </ion-button>
-      <ion-button float-right fill="clear" color="danger" (click)="dismiss()">
-        Annuler
-      </ion-button>
     </ion-list>
   </form>
 </ion-content>  
+<ion-footer>
+  <ion-toolbar>
+    <ion-button class="ion-float-right" color="primary" (click)="onSubmit()">
+      OK
+    </ion-button>
+    <ion-button class="ion-float-right" fill="clear" color="danger" (click)="dismiss()">
+      Annuler
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

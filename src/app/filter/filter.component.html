@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Filtrer</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <form>  
+    <ion-list>
+      <ion-item>
+        <ion-label position="start">
+          <ion-icon size="large" slot="start" name="search-circle"></ion-icon>
+        </ion-label>
+        <ion-input name="label" [(ngModel)]="labelFilter" type="text" placeholder="Entrer le filtre"></ion-input>
+      </ion-item>
+      
+      <ion-list>
+        <ion-item (click)="allSelected ? deselectAll() : selectAll()">
+          <ion-title>Type</ion-title>
+          <ion-checkbox slot="start" [checked]="allSelected"></ion-checkbox>
+        </ion-item>
+        <ion-item *ngFor="let type of spiceTypes" (click)="toggleType(type.value)">
+          <ion-label>{{type.label}}</ion-label>
+          <ion-checkbox slot="start" [checked]="isSelected(type.value)"></ion-checkbox>
+        </ion-item>
+      </ion-list>
+    </ion-list>
+  </form>
+</ion-content>  
+<ion-footer>
+  <ion-toolbar>
+    <ion-button class="ion-float-right" color="primary" (click)="onSubmit()">
+      OK
+    </ion-button>
+    <ion-button class="ion-float-right" fill="clear" color="danger" (click)="dismiss()">
+      Annuler
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

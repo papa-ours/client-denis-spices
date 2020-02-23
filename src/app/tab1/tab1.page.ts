@@ -5,7 +5,10 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { SPICE_TYPES } from '../spice-types';
 import { EditComponent } from '../edit/edit.component';
-import { ModalController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
+import { FilterComponent } from '../filter/filter.component';
+import { PrintComponent } from '../print/print.component';
+import { FilterService } from '../filter.service';
 
 @Component({
   selector: 'app-tab1',
@@ -18,7 +21,13 @@ export class Tab1Page implements OnInit {
   public sortDirection: number;
   public spices: Spice[];
 
-  constructor(private service: SpiceService, private router: Router, private modalCtrl: ModalController) {
+  constructor(
+    private service: SpiceService,
+    private router: Router,
+    private modalCtrl: ModalController,
+    public filterService: FilterService,
+    private toastController: ToastController,
+  ) {
     this.spices = [];
     this.sortColumn = "label";
     this.sortDirection = 1;
@@ -39,6 +48,19 @@ export class Tab1Page implements OnInit {
     this.sortSpices();
   }
 
+  private async showToast(message: string): Promise<void> {
+    const toast: HTMLIonToastElement = await this.toastController.create({
+      message: message,
+      duration: 2200,
+      position: 'bottom',
+      color: 'danger',
+      showCloseButton: true,
+      closeButtonText: 'OK',
+    });
+
+    toast.present();
+  }
+
   private sortSpices(): void {
     this.spices.sort((spice1: Spice, spice2: Spice) => {
       const val1: string = (this.sortColumn === 'label' ? spice1.label : spice1.type.label).replace('É', 'E');
@@ -55,6 +77,7 @@ export class Tab1Page implements OnInit {
   public async addSpice(): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: EditComponent,
+      keyboardClose: true,
       componentProps: {
         isAdd: true,
         spice: {
@@ -66,19 +89,72 @@ export class Tab1Page implements OnInit {
     });
     modal.present();
     const {data} = await modal.onDidDismiss();
-    if (data.updated) {
+    if (data && data.updated) {
       this.getSpices();
     }
   }
 
-  private getSpices(): void {
-    this.service.getAllSpices().subscribe((spices: Spice[]) => {
+  public getSpices(): void {
+    this.service.getSpices().subscribe((spices: Spice[]) => {
+      const oldSpices: Spice[] = this.spices;
       this.spices = spices;
+      this.spices.forEach((spice: Spice) => {
+        const oldSpice: Spice | undefined = oldSpices.find((s: Spice) => s.label === spice.label);
+        if (oldSpice) {
+          spice.selected = oldSpice.selected;
+        }
+      });
       this.sortSpices();
     });
   }
 
+  public async showFilterOptions(): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: FilterComponent,
+    });
+    await modal.present();
+    const {data} = await modal.onDidDismiss();
+    if (data && !data.isCancel) {
+      this.getSpices();
+    }
+  }
+
+  public async showPrintPage(): Promise<void> {
+    if (!this.numberOfSelectedSpices) {
+      this.showToast("Vous devez sélectionner au moins une épice.");
+      return;
+    }
+
+    const modal = await this.modalCtrl.create({
+      component: PrintComponent,
+      componentProps: {
+        spices: this.selectedSpices,
+      },
+    });
+    await modal.present();
+  }
+
   public goToAddView(): void {
     this.router.navigateByUrl("/tabs/new");
+  }
+
+  public get allSelected(): boolean {
+    return this.spices.length > 0 && this.numberOfSelectedSpices === this.spices.length;
+  }
+
+  public get numberOfSelectedSpices(): number {
+    return this.selectedSpices.length;
+  }
+
+  public get selectedSpices(): Spice[] {
+    return this.spices.filter((spice: Spice) => spice.selected);
+  }
+
+  public setAll(selected: boolean): void {
+    this.spices.forEach((spice: Spice) => spice.selected = selected);
+  }
+
+  public gotImage(image: string, index: number): void {
+    this.spices[index].image = image;
   }
 }

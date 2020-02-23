@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Imprimer</ion-title>
+    <ion-buttons slot="end" *ngIf="ready">
+      <ion-button (click)="changePage(-1)" [disabled]="currentPage===0">
+        <ion-icon slot="icon-only" name="caret-back-circle"></ion-icon>
+      </ion-button>
+      <ion-text>
+        <p>{{(currentPage + 1) + '/' + numberOfPages}}</p>
+      </ion-text>
+      <ion-button (click)="changePage(1)" [disabled]="(currentPage + 1)===numberOfPages">
+        <ion-icon slot="icon-only" name="caret-forward-circle"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list *ngIf="!ready; else preview">
+    <ion-item>
+      <ion-label>Commencer à partir de: </ion-label>
+      <ion-input type="number" [max]="max - 1" min="0" [(ngModel)]="indexOffset"></ion-input>
+    </ion-item>
+  </ion-list>
+  <ng-template #preview>
+    <img id="preview" [src]="previewData[currentPage].safeUrl"/>
+  </ng-template>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-button (click)="ready ? save(currentPage) : generate()" expand="block" [disabled]="!mask">
+      <ion-spinner *ngIf="loading" name="lines-small"></ion-spinner>
+      {{ready ? 'Sauvegarder (' + (currentPage + 1) + '/' + numberOfPages + ')' : 'Générer'}}
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

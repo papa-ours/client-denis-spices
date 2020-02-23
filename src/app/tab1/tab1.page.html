@@ -1,10 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Les épices à Denis</ion-title>
+  </ion-toolbar>
+</ion-header>
 <ion-content>
-  <ion-grid fixed *ngIf="spices.length; else noSpices">
+  <ion-grid fixed>
     <ion-row>
       <ion-col size-md="2" size-sm="0" size-xs="0"></ion-col>
       <ion-col size-md="8" size-sm="12" size-xs="12">
-        <ion-item>
-          <ion-label class="sortable" [class.sort]="sortColumn === 'label'" (click)="setSort('label')">
+        <ion-text (click)="showFilterOptions()" color="primary" id="filter">{{filterService.prettyFilter}}</ion-text>
+        <ion-item class="ion-no-padding">
+          <ion-item id="select-all" (click)="allSelected ? setAll(false) : setAll(true)">
+            <ion-checkbox slot="start" [checked]="allSelected"></ion-checkbox>
+          </ion-item>
+          <ion-label class="ion-margin-start" class="sortable" [class.sort]="sortColumn === 'label'" (click)="setSort('label')">
             Nom
             <ion-icon *ngIf="sortColumn === 'label' && sortDirection === -1" name="caret-down"></ion-icon>
             <ion-icon *ngIf="sortColumn === 'label' && sortDirection === 1" name="caret-up"></ion-icon>
@@ -14,31 +23,29 @@
             <ion-icon *ngIf="sortColumn === 'type' && sortDirection === -1" name="caret-down"></ion-icon>
             <ion-icon *ngIf="sortColumn === 'type' && sortDirection === 1" name="caret-up"></ion-icon>
           </ion-label>
+          <ion-badge color="tertiary" mode="ios">{{numberOfSelectedSpices}}</ion-badge>
+          <ion-button color="primary" (click)="showPrintPage()">
+            <ion-icon slot="icon-only" name="print"></ion-icon>
+          </ion-button>
+          <ion-button color="primary" (click)="showFilterOptions()">
+            <ion-icon slot="icon-only" name="funnel"></ion-icon>
+          </ion-button>
           <ion-button color="primary" (click)="addSpice()">
             <ion-icon slot="icon-only" name="add-circle"></ion-icon>
           </ion-button>
         </ion-item>
         <ion-list>
-          <app-spice-item *ngFor="let spice of spices" [label]="spice.label" [type]="spice.type" (editEvent)="getSpices()">
+          <ion-item *ngIf="!spices.length">
+            <ion-label>Aucune épice ne correspond à ce filtre</ion-label>
+          </ion-item>
+          <app-spice-item *ngFor="let spice of spices; let ind=index"
+            [label]="spice.label" [type]="spice.type" [selected]="spice.selected"
+            (click)="spice.selected=!spice.selected"
+            (editEvent)="getSpices()" (gotImage)="gotImage($event, ind)">
           </app-spice-item>
         </ion-list>
       </ion-col>
       <ion-col size-md="2" size-sm="0" size-xs="0"></ion-col>
     </ion-row>
   </ion-grid>
-
-  <ng-template #noSpices>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title color="danger">
-          Il n'y a aucune épice
-          <ion-button class="ion-float-right" (click)="goToAddView()">
-            <ion-icon name="add-circle"></ion-icon>
-            AJOUTER
-          </ion-button>
-        </ion-title>
-      </ion-toolbar>
-    </ion-header>
-  </ng-template>
-
 </ion-content>

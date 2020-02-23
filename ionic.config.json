@@ -1,5 +1,7 @@
 {
   "name": "denis-spices",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }
