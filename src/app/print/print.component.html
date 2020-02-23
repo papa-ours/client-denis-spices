@@ -33,5 +33,8 @@
       <ion-spinner *ngIf="loading" name="lines-small"></ion-spinner>
       {{ready ? 'Sauvegarder (' + (currentPage + 1) + '/' + numberOfPages + ')' : 'Générer'}}
     </ion-button>
+    <ion-button (click)="dismiss()" fill="clear" color="danger" expand="block">
+      Fermer
+    </ion-button>
   </ion-toolbar>
 </ion-footer>

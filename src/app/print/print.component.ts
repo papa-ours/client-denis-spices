@@ -3,6 +3,7 @@ import * as p5 from 'p5';
 import { Spice } from '../spice';
 import { SERVER } from '../server';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ModalController } from '@ionic/angular';
 
 interface Preview {
   safeUrl: SafeUrl;
@@ -37,6 +38,7 @@ export class PrintComponent implements OnInit {
   
   constructor(
     private sanitizer: DomSanitizer,
+    private modalController: ModalController,
   ) {
     this.spices = [];
     this.ready = false;
@@ -58,6 +60,7 @@ export class PrintComponent implements OnInit {
 
   ngOnInit() {
     this.p5 = new p5((p5: p5) => this.sketch(p5), document.getElementById("preview-canvas"));
+    this.p5.pixelDensity(10);
     this.getMask();
   }
 
@@ -133,12 +136,10 @@ export class PrintComponent implements OnInit {
     });
   }
 
-  private async drawSpices(spices: Spice[], startIndex: number): Promise<void> {
-    let index: number = 0;
-    while (index < spices.length) {
-      await this.drawSpice(spices[index], startIndex + index);
-      index++;
-    }
+  private async drawSpices(spices: Spice[], startIndex: number): Promise<void[]> {
+    return Promise.all(
+      spices.map((spice: Spice, index: number) => this.drawSpice(spice, startIndex + index)),
+    );
   }
 
   private sketch(p5: p5): void {
@@ -176,12 +177,16 @@ export class PrintComponent implements OnInit {
 
     this.p5.fill(255);
     this.p5.rectMode(this.p5.CENTER);
-    this.p5.textSize(10);
+    this.p5.textSize(spice.label.length > 30 ? 10 : spice.label.length > 20 ? 12 : 14);
     this.p5.textAlign(this.p5.CENTER, this.p5.CENTER);
-    this.p5.text(spice.label, x, y - this.circleDiameter / 5, this.circleDiameter - 30, this.circleDiameter - 30);
+    this.p5.text(spice.label, x, y - this.circleDiameter / 6, this.circleDiameter - 30, this.circleDiameter - 30);
 
     this.p5.imageMode(this.p5.CENTER);
     const image: p5.Image = await this.getRoundImage(spice.label);
     this.p5.image(image, x, y + this.circleDiameter / 4, this.imageSize, this.imageSize);
+  }
+
+  public dismiss(): void {
+    this.modalController.dismiss();
   }
 }
