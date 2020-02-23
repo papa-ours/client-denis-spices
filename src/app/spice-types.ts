@@ -8,7 +8,7 @@ export const SPICE_TYPES: SpiceType[] = [
         value: 0,
     }, {
         label: "Épice",
-        color: "rgb(204, 58, 50)",
+        color: "rgb(255, 89, 89)",
         value: 1,
     }, {
         label: "Poivre",
@@ -26,5 +26,9 @@ export const SPICE_TYPES: SpiceType[] = [
         label: "BBQ",
         color: "rgb(197, 156, 113)",
         value: 5,
-    },
+    }, {
+        label: "Piment",
+        color: "rgb(204, 58, 50)",
+        value: 6,
+    }
 ]
