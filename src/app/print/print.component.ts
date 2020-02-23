@@ -98,7 +98,9 @@ export class PrintComponent implements OnInit {
   }
 
   public save(page: number): void {
-    window.open(this.previewData[page].data, "_blank");
+    this.p5.loadImage(this.previewData[page].data, (image: p5.Image) => {
+      this.p5.save(image, "epice-" + page + ".png");
+    })
   }
 
   public async generatePage(spices: Spice[], startIndex: number): Promise<Preview> {
