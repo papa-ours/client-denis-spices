@@ -60,7 +60,7 @@ export class PrintComponent implements OnInit {
 
   ngOnInit() {
     this.p5 = new p5((p5: p5) => this.sketch(p5), document.getElementById("preview-canvas"));
-    this.p5.pixelDensity(6);
+    // this.p5.pixelDensity(6);
     this.getMask();
   }
 
