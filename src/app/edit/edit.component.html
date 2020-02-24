@@ -14,19 +14,23 @@
       <ion-item>
         <ion-label>Image</ion-label>
         <ion-spinner *ngIf="loading" size="sm" name="lines-small"></ion-spinner>
+        <ion-button (click)="chooseFile()">
+          <ion-icon slot="start" name="download"></ion-icon>
+          Importer
+        </ion-button>
         <ion-button (click)="loadImages()" [disabled]="spice.label == ''">
           <ion-icon slot="start" name="refresh-circle"></ion-icon>
-          Obtenir les images
+          Rafraîchir
         </ion-button>
       </ion-item>
       <ion-item class="images-container">
         <div *ngFor="let src of imageSources; let ind=index" class="image-item" [style.left.px]="ind * 80">
           <img [src]="src" [class.selected]="src===selectedImage" (click)="selectedImage=src"/>
           <p (click)="showImageAlert(src)" class="image-label">
-            {{parseSourceToImageLabel(src)}}
+            {{parseSourceToImageLabel(src) ? parseSourceToImageLabel(src) : 'Preview'}}
           </p>
         </div>
-        <ion-label *ngIf="noResults" color="danger">Aucun résultats</ion-label>
+        <ion-label *ngIf="noResults && imageSources.length === 0" color="danger">Aucun résultats</ion-label>
       </ion-item>
       
       <ion-list>

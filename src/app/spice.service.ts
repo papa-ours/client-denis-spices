@@ -57,4 +57,8 @@ export class SpiceService {
       {headers: new HttpHeaders({'Content-Type': 'application/json'})}
     );
   }
+
+  public getImageContent(label: string): Observable<string> {
+    return this.http.get<string>(`${SERVER}spice/image/content/${label}`);
+  }
 }

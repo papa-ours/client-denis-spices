@@ -4,7 +4,7 @@
     <ion-label>{{label}}</ion-label>
     <ion-label>{{type.label}}</ion-label>
     <ion-thumbnail *ngIf="imageSource !== '-1'; else loader" slot="end">
-      <img src={{imageSource}}/>
+      <img *ngIf="imageSource" src={{imageSource}}/>
     </ion-thumbnail>
     <ng-template #loader>
       <ion-spinner name="lines-small"></ion-spinner>

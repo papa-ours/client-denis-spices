@@ -56,7 +56,7 @@ export class EditComponent implements OnInit {
     toast.present();
   }
 
-  public onSubmit() {
+  public async onSubmit(): Promise<void> {
     this.spice.label = this.spice.label.trim();
     if (this.spice.label === "") {
       this.showToast('Le nom ne doit pas être vide');
@@ -64,11 +64,34 @@ export class EditComponent implements OnInit {
     }
 
     if (this.selectedImage === "") {
-      this.showToast('Veuillez sélectionner une image');
-      return;
+      const confirmation: boolean = await this.showNoImageConfirmation();
+      if (!confirmation) {
+        return;
+      }
     }
 
     this.isAdd ? this.addSpice() : this.updateSpice();
+  }
+
+  private async showNoImageConfirmation(): Promise<boolean> {
+    const alert = await this.alertController.create({
+      message: 'Voulez-vous vraiment continuer sans ajouter une image?',
+      buttons: [
+        {
+          text: 'NON',
+          handler: () => alert.dismiss(),
+          role: 'cancel',
+        },
+        {
+          text: 'OUI',
+          handler: () => alert.dismiss(),
+          role: 'confirm',
+        }
+      ]
+    });
+    alert.present();
+
+    return (await alert.onDidDismiss()).role === 'confirm';
   }
 
   private updateSpice(): void {
@@ -111,6 +134,42 @@ export class EditComponent implements OnInit {
     this.modalCtrl.dismiss({updated});
   }
 
+  public async chooseFile(): Promise<void> {
+    const fileInput: HTMLInputElement = document.createElement("input");
+    fileInput.setAttribute("type", "file");
+    fileInput.click();
+    
+    fileInput.addEventListener("input", async () => {
+      const file: File = fileInput.files[0];
+      if (!this.validateImage(file)) {
+        return;
+      }
+
+      const dataUrl: string = await this.readFile(file);
+      this.imageSources = [dataUrl];
+      this.selectedImage = dataUrl;
+    });
+  }
+
+  public async readFile(file: File): Promise<string> {
+    const reader: FileReader = new FileReader();
+    reader.readAsDataURL(file);
+    return new Promise((resolve) => {
+      reader.addEventListener("load", () => {
+        resolve(reader.result as string);
+      });
+    });
+  }
+
+  public validateImage(file: any): boolean {
+    if (!file.type.includes("image")) {
+      this.showToast("Le fichier doit être une image");
+      return false;
+    }
+
+    return true;
+  }
+
   public updateType($event: CustomEvent) {
     this.spice.type = this.spiceTypes[$event.detail.value];
   }
@@ -125,6 +184,9 @@ export class EditComponent implements OnInit {
   }
 
   public parseSourceToImageLabel(source: string): string {
+    if (source.includes("data:image")) {
+      return "";
+    }
     source = source.replace(".jpg", "");
     return source.substr(source.lastIndexOf("/") + 1).split("-").join(" ");
   }

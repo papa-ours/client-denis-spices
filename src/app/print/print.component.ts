@@ -4,6 +4,7 @@ import { Spice } from '../spice';
 import { SERVER } from '../server';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ModalController, Platform } from '@ionic/angular';
+import { SpiceService } from '../spice.service';
 
 interface Preview {
   safeUrl: SafeUrl;
@@ -40,6 +41,7 @@ export class PrintComponent implements OnInit {
   constructor(
     private sanitizer: DomSanitizer,
     private modalController: ModalController,
+    private service: SpiceService,
     private platform: Platform,
   ) {
     this.spices = [];
@@ -167,7 +169,7 @@ export class PrintComponent implements OnInit {
           resolve(image);
         },
         () => reject(),
-      )
+      );
     });
   }
 
@@ -178,22 +180,42 @@ export class PrintComponent implements OnInit {
     };
   }
 
-  private async drawSpice(spice: Spice, index: number): Promise<void> {
-    const {x, y} = this.getPosition(index);
-    this.p5.fill(spice.type.color);
+  private async drawEllipse(pos: {x: number, y: number}, color: string): Promise<void> {
+    this.p5.fill(color);
     this.p5.ellipseMode(this.p5.CENTER);
     this.p5.noStroke();
-    this.p5.ellipse(x, y, this.circleDiameter);
+    this.p5.ellipse(pos.x, pos.y, this.circleDiameter);
+  }
 
+  private async drawImage(pos: {x: number, y: number}, label: string): Promise<void> {
+    this.p5.imageMode(this.p5.CENTER);
+    try {
+      const image: p5.Image = await this.getRoundImage(label);
+      this.p5.image(image, pos.x, pos.y + this.circleDiameter / 4, this.imageSize, this.imageSize);
+    } catch {
+      throw Error();
+    }
+  }
+
+  private async drawLabel(pos: {x: number, y: number}, label: string, imageAdded: boolean): Promise<void> {
     this.p5.fill(255);
     this.p5.rectMode(this.p5.CENTER);
-    this.p5.textSize(spice.label.length > 30 ? 10 : spice.label.length > 20 ? 12 : 14);
+    this.p5.textSize(label.length > 30 ? 10 : label.length > 20 ? 12 : 14);
     this.p5.textAlign(this.p5.CENTER, this.p5.CENTER);
-    this.p5.text(spice.label, x, y - this.circleDiameter / 6, this.circleDiameter - 30, this.circleDiameter - 30);
+    const textYPosition: number = imageAdded ? pos.y - this.circleDiameter / 6 : pos.y;
+    this.p5.text(label, pos.x, textYPosition, this.circleDiameter - 30, this.circleDiameter - 30);
+  }
 
-    this.p5.imageMode(this.p5.CENTER);
-    const image: p5.Image = await this.getRoundImage(spice.label);
-    this.p5.image(image, x, y + this.circleDiameter / 4, this.imageSize, this.imageSize);
+  private async drawSpice(spice: Spice, index: number): Promise<void> {
+    const pos: {x: number, y: number} = this.getPosition(index);
+    await this.drawEllipse(pos, spice.type.color); 
+    let imageAdded: boolean = true;
+    try {
+      await this.drawImage(pos, spice.label);   
+    } catch {
+      imageAdded = false;
+    }
+    this.drawLabel(pos, spice.label, imageAdded);
   }
 
   public dismiss(): void {
