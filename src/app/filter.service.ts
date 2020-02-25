@@ -7,9 +7,11 @@ import { SpiceType } from './spice-type';
 })
 export class FilterService {
   public label: string;
+  public nonPrinted: boolean;
   public types: number[];
   constructor() {
     this.label = "";
+    this.nonPrinted = false;
     this.selectAll();
   }
 
@@ -18,7 +20,7 @@ export class FilterService {
   }
 
   public get encodedQuery(): string {
-    return `?label=${this.label}&type=${this.types.join(",")}`;
+    return `?label=${this.label}&type=${this.types.join(",")}&printed=${this.nonPrinted ? 0 : -1}`;
   }
 
   public get prettyFilter(): string {
@@ -32,6 +34,13 @@ export class FilterService {
         filter += " ET "
       }
       filter += `Type PARMI ${this.typeLabels.join(", ")}`
+    }
+
+    if (this.nonPrinted) {
+      if (filter.length) {
+        filter += " ET ";
+      }
+      filter += " PAS Imprimé"
     }
 
     return filter ? filter : "Aucun filtre";

@@ -17,9 +17,13 @@ import { FilterService } from '../filter.service';
 })
 export class Tab1Page implements OnInit {
 
+  public readonly SPICE_PER_PAGE: number = 24;
   public sortColumn: string;
   public sortDirection: number;
   public spices: Spice[];
+  public pageCount: number;
+  public currentPage: number;
+  public loading: boolean;
 
   constructor(
     private service: SpiceService,
@@ -31,6 +35,8 @@ export class Tab1Page implements OnInit {
     this.spices = [];
     this.sortColumn = "label";
     this.sortDirection = 1;
+    this.initPages();
+    this.loading = false;
   }
 
   public ngOnInit(): void {
@@ -40,6 +46,26 @@ export class Tab1Page implements OnInit {
     ).subscribe(
       () => this.getSpices()
     );
+  }
+
+  public initPages(): void {
+    this.currentPage = 0;
+    this.getPageCount();
+  }
+
+  public getPageCount(): void {
+    this.service.getSpiceCount().subscribe((count: number) => this.pageCount = Math.ceil(count / this.SPICE_PER_PAGE));
+  }
+
+  public changePage(change: number): void {
+    this.currentPage += change;
+    if (this.currentPage === this.pageCount) {
+      this.currentPage = this.pageCount;
+    }
+    if (this.currentPage < 0) {
+      this.currentPage = 0;
+    }
+    this.getSpices();
   }
 
   public setSort(column: string): void {
@@ -95,7 +121,9 @@ export class Tab1Page implements OnInit {
   }
 
   public getSpices(): void {
-    this.service.getSpices().subscribe((spices: Spice[]) => {
+    this.spices = [];
+    this.loading = true;
+    this.service.getSpices(this.currentPage * this.SPICE_PER_PAGE, this.SPICE_PER_PAGE).subscribe((spices: Spice[]) => {
       const oldSpices: Spice[] = this.spices;
       this.spices = spices;
       this.spices.forEach((spice: Spice) => {
@@ -105,6 +133,7 @@ export class Tab1Page implements OnInit {
         }
       });
       this.sortSpices();
+      this.loading = false;
     });
   }
 
@@ -116,6 +145,7 @@ export class Tab1Page implements OnInit {
     const {data} = await modal.onDidDismiss();
     if (data && !data.isCancel) {
       this.getSpices();
+      this.initPages();
     }
   }
 

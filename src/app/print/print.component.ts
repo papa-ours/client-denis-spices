@@ -190,8 +190,11 @@ export class PrintComponent implements OnInit {
   private async drawImage(pos: {x: number, y: number}, label: string): Promise<void> {
     this.p5.imageMode(this.p5.CENTER);
     try {
+      this.p5.fill(255);
+      const imageY: number = pos.y + this.circleDiameter / 4;
+      this.p5.ellipse(pos.x, imageY, this.imageSize, this.imageSize);
       const image: p5.Image = await this.getRoundImage(label);
-      this.p5.image(image, pos.x, pos.y + this.circleDiameter / 4, this.imageSize, this.imageSize);
+      this.p5.image(image, pos.x, imageY, this.imageSize, this.imageSize);
     } catch {
       throw Error();
     }

@@ -42,7 +42,7 @@ export class SpiceGridPage implements OnInit {
   }
 
   public getSpices(): void {
-    this.service.getSpices().subscribe((spices: Spice[]) => {
+    this.service.getSpices(0, 0).subscribe((spices: Spice[]) => {
       this.allSpices = spices;
       this.activeSpices = spices.slice(0, 24);
     });

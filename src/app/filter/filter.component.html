@@ -12,6 +12,11 @@
         </ion-label>
         <ion-input name="label" [(ngModel)]="labelFilter" type="text" placeholder="Entrer le filtre"></ion-input>
       </ion-item>
+
+      <ion-item (click)="nonPrinted = !nonPrinted">
+        <ion-label>Non imprimé</ion-label>
+        <ion-checkbox slot="start" [checked]="nonPrinted"></ion-checkbox>
+      </ion-item>
       
       <ion-list>
         <ion-item (click)="allSelected ? deselectAll() : selectAll()">

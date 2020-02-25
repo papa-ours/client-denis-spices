@@ -13,11 +13,11 @@ import { FilterService } from './filter.service';
 export class SpiceService {
   constructor(private http: HttpClient, private filterService: FilterService) { }
 
-  public getSpices(): Observable<Spice[]> {
+  public getSpices(offset: number, limit: number): Observable<Spice[]> {
     return new Observable<Spice[]>(subscriber => {
-      this.http.get<any[]>(`${SERVER}/spice${this.filterService.encodedQuery}`).subscribe(response => {
+      this.http.get<any[]>(`${SERVER}/spice${this.filterService.encodedQuery}&offset=${offset}&limit=${limit}`).subscribe(response => {
         const spices: Spice[] = response.map((val: any) => {
-          return {label: val.label, type: SPICE_TYPES[val.type]}
+          return {label: val.label, type: SPICE_TYPES[val.type], printed: val.printed === 1}
         });
         subscriber.next(spices);
       });
@@ -30,6 +30,10 @@ export class SpiceService {
         subscriber.next(response.url);
       });
     });
+  }
+
+  public getSpiceCount(): Observable<number> {
+    return this.http.get<number>(`${SERVER}/spice/count${this.filterService.encodedQuery}`);
   }
 
   public loadImages(label: string): Observable<string[]> {
@@ -53,7 +57,7 @@ export class SpiceService {
   public updateSpice(oldLabel: string, spice: Spice, image: string): Observable<void> {
     return this.http.put<void>(
       SERVER + "spice/update",
-      {oldLabel: oldLabel, label: spice.label, type: spice.type.value, image: image},
+      {oldLabel: oldLabel, label: spice.label, type: spice.type.value, image: image, printed: spice.printed ? 1 : 0},
       {headers: new HttpHeaders({'Content-Type': 'application/json'})}
     );
   }

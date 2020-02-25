@@ -13,10 +13,12 @@ export class FilterComponent implements OnInit {
   public labelFilter: string;
   public selectedTypes: number[];
   public readonly spiceTypes: SpiceType[] = SPICE_TYPES;
+  public nonPrinted: boolean;
 
   constructor(private modalCtrl: ModalController, private service: FilterService, private toastController: ToastController) {
     this.labelFilter = JSON.parse(JSON.stringify(this.service.label));
     this.selectedTypes = JSON.parse(JSON.stringify(this.service.types));
+    this.nonPrinted = JSON.parse(JSON.stringify(this.service.nonPrinted));
   }
 
   public ngOnInit(): void {
@@ -67,6 +69,7 @@ export class FilterComponent implements OnInit {
 
     this.service.label = this.labelFilter;
     this.service.types = this.selectedTypes;
+    this.service.nonPrinted = this.nonPrinted;
 
     this.dismiss(false);
   }

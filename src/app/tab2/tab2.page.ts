@@ -57,7 +57,7 @@ export class Tab2Page {
     }
 
     this.service.createSpice(this.spice, this.selectedImage).subscribe(async () => {
-      this.service.getSpices();
+      this.service.getSpices(0, 0);
       this.spice = {
         label: "",
         type: SPICE_TYPES[0],

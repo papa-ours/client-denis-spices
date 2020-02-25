@@ -15,6 +15,7 @@ export class SpiceItemComponent implements OnInit, Spice {
 
   @Input() public label: string;
   @Input() public type: SpiceType;
+  @Input() public printed: boolean;
   @Input() public selected: boolean;
   @Output() public editEvent: EventEmitter<void>;
   @Output() public gotImage: EventEmitter<string>;
@@ -53,6 +54,7 @@ export class SpiceItemComponent implements OnInit, Spice {
     return {
       label: this.label,
       type: this.type,
+      printed: this.printed,
     };
   }
 
