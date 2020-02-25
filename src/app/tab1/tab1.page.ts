@@ -54,7 +54,7 @@ export class Tab1Page implements OnInit {
   }
 
   public getPageCount(): void {
-    this.service.getSpiceCount().subscribe((count: number) => this.pageCount = Math.ceil(count / this.SPICE_PER_PAGE));
+    this.service.getSpiceCount().subscribe((count: number) => this.pageCount = count ? Math.ceil(count / this.SPICE_PER_PAGE) : 1);
   }
 
   public changePage(change: number): void {
@@ -182,9 +182,5 @@ export class Tab1Page implements OnInit {
 
   public setAll(selected: boolean): void {
     this.spices.forEach((spice: Spice) => spice.selected = selected);
-  }
-
-  public gotImage(image: string, index: number): void {
-    this.spices[index].image = image;
   }
 }

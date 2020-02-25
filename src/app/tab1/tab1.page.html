@@ -54,7 +54,7 @@
           <app-spice-item *ngFor="let spice of spices; let ind=index"
             [label]="spice.label" [type]="spice.type" [selected]="spice.selected" [printed]="spice.printed"
             (click)="spice.selected=!spice.selected"
-            (editEvent)="getSpices()" (gotImage)="gotImage($event, ind)">
+            (editEvent)="getSpices()">
           </app-spice-item>
         </ion-list>
       </ion-col>
