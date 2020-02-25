@@ -26,9 +26,6 @@ export class SpiceItemComponent implements OnInit, Spice {
   }
 
   public ngOnInit(): void {
-    // this.service.getImageForSpice(this.label).pipe(first()).subscribe((source: string) => {
-    //   this.imageSource = source;
-    // });
     this.imageSource = `${SERVER}/spice/image/content/${this.label}`;
   }
 
