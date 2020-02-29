@@ -67,7 +67,7 @@ export class SpiceItemComponent implements OnInit, Spice {
         }, {
           text: 'OUI',
           handler: () => {
-            this.service.deleteSpice(this.label).subscribe(() => this.editEvent.emit());
+            this.service.deleteSpice(this._id).subscribe(() => this.editEvent.emit());
           }
         }
       ]

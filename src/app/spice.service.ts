@@ -48,9 +48,9 @@ export class SpiceService {
     );
   }
 
-  public deleteSpice(label: string): Observable<void> {
+  public deleteSpice(_id: string): Observable<void> {
     return this.http.delete<void>(
-      SERVER + "spice/delete/" + label,
+      SERVER + "spice/delete/" + _id,
     );
   }
 
