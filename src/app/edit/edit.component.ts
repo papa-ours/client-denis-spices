@@ -11,6 +11,7 @@ import { ToastController, ModalController, AlertController } from '@ionic/angula
   styleUrls: ['./edit.component.scss'],
 })
 export class EditComponent implements OnInit {
+  @Input() public _id: string;
   @Input() public spice: Spice;
   @Input() public isAdd: boolean;
   public readonly spiceTypes: SpiceType[] = SPICE_TYPES;
@@ -18,12 +19,17 @@ export class EditComponent implements OnInit {
   public loading: boolean;
   public noResults: boolean;
   public selectedImage: string;
-  private startLabel: string;
 
-  constructor(private toastController: ToastController, private service: SpiceService, private modalCtrl: ModalController, private alertController: AlertController) {
+  constructor(
+    private toastController: ToastController,
+    private service: SpiceService,
+    private modalCtrl: ModalController,
+    private alertController: AlertController,
+  ) {
     this.spice = {
       label: "",
       type: SPICE_TYPES[0],
+      expirationDate: "",
     }
     this.imageSources = [];
     this.loading = false;
@@ -32,7 +38,6 @@ export class EditComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.startLabel = this.spice.label;
     if (this.spice.label) {
       this.loadImages();
       this.getCurrentImage();
@@ -40,7 +45,7 @@ export class EditComponent implements OnInit {
   }
 
   private getCurrentImage(): void {
-    this.service.getImageForSpice(this.spice.label).subscribe((imageSource: string) => this.selectedImage = imageSource);
+    this.service.getImageForSpice(this._id).subscribe((imageSource: string) => this.selectedImage = imageSource);
   }
 
   private async showToast(message: string): Promise<void> {
@@ -95,7 +100,7 @@ export class EditComponent implements OnInit {
   }
 
   private updateSpice(): void {
-    this.service.updateSpice(this.startLabel, this.spice, this.selectedImage).subscribe(async () => {
+    this.service.updateSpice(this._id, this.spice, this.selectedImage).subscribe(async () => {
       this.spice = {
         label: "",
         type: SPICE_TYPES[0],
@@ -110,6 +115,7 @@ export class EditComponent implements OnInit {
       this.spice = {
         label: "",
         type: SPICE_TYPES[0],
+        expirationDate: "",
       }
       this.imageSources = [];
       this.dismiss(true);

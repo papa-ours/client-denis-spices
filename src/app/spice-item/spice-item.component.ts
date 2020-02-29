@@ -17,6 +17,8 @@ export class SpiceItemComponent implements OnInit, Spice {
   @Input() public label: string;
   @Input() public type: SpiceType;
   @Input() public printed: boolean;
+  @Input() public expirationDate: string;
+  @Input() public _id: string;
   @Input() public selected: boolean;
   @Output() public editEvent: EventEmitter<void>;
   public imageSource: string;
@@ -26,7 +28,7 @@ export class SpiceItemComponent implements OnInit, Spice {
   }
 
   public ngOnInit(): void {
-    this.imageSource = `${SERVER}/spice/image/content/${this.label}`;
+    this.imageSource = `${SERVER}spice/image/content/${this._id}`;
   }
 
   public async showEditModal(): Promise<void> {
@@ -34,6 +36,7 @@ export class SpiceItemComponent implements OnInit, Spice {
       component: EditComponent,
       componentProps: {
         isAdd: false,
+        _id: this._id,
         spice: this.asSpice(),
       },
       cssClass: 'custom-modal',
@@ -50,6 +53,7 @@ export class SpiceItemComponent implements OnInit, Spice {
       label: this.label,
       type: this.type,
       printed: this.printed,
+      expirationDate: this.expirationDate,
     };
   }
 

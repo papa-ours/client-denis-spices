@@ -24,6 +24,8 @@
 		6D538095D8E74E66807D5813 /* CDVSplashScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 042C3E1A6A274AA5BDE9491D /* CDVSplashScreen.m */; };
 		6EE1870C472A46A29EEA0C10 /* CDVIonicKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 7310316BC47C40198D16E6B9 /* CDVIonicKeyboard.m */; };
 		8509327AFF154E4FBA7D91F0 /* CDVViewController+SplashScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 0F60A2F6A3CC4D8A9BFF3EA1 /* CDVViewController+SplashScreen.m */; };
+		909D3FD3E3464347A9F210B8 /* DatePicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BCDC507B9E94D72BA4E33B9 /* DatePicker.m */; };
+		028DBE6646A04659BF1154DC /* DatePicker.xib in Resources */ = {isa = PBXBuildFile; fileRef = C12A07C76F93450392933BBC /* DatePicker.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -90,6 +92,9 @@
 		EB87FDF41871DAF40020F90C /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = ../../config.xml; sourceTree = "<group>"; };
 		ED33DF2A687741AEAF9F8254 /* Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
 		F840E1F0165FE0F500CFE078 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = MyApp/config.xml; sourceTree = "<group>"; };
+		9BCDC507B9E94D72BA4E33B9 /* DatePicker.m */ = {isa = PBXFileReference; name = "DatePicker.m"; path = "cordova-plugin-datepicker/DatePicker.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
+		E1732A76078F463CA765CEDD /* DatePicker.h */ = {isa = PBXFileReference; name = "DatePicker.h"; path = "cordova-plugin-datepicker/DatePicker.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
+		C12A07C76F93450392933BBC /* DatePicker.xib */ = {isa = PBXFileReference; name = "DatePicker.xib"; path = "DatePicker.xib"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = file.xib; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,6 +166,7 @@
 				3047A50E1AB8057F00498E2A /* config */,
 				8D1107310486CEB800E47090 /* MyApp-Info.plist */,
 				6AFF5BF81D6E424B00AB3073 /* CDVLaunchScreen.storyboard */,
+				C12A07C76F93450392933BBC /* DatePicker.xib */,
 			);
 			name = Resources;
 			path = MyApp/Resources;
@@ -214,6 +220,8 @@
 				4ACAA1C4C248484797EA215A /* IONAssetHandler.h */,
 				7310316BC47C40198D16E6B9 /* CDVIonicKeyboard.m */,
 				9ADEBE70C5E94B3DBC3821C2 /* CDVIonicKeyboard.h */,
+				9BCDC507B9E94D72BA4E33B9 /* DatePicker.m */,
+				E1732A76078F463CA765CEDD /* DatePicker.h */,
 			);
 			name = Plugins;
 			path = MyApp/Plugins;
@@ -313,6 +321,7 @@
 				302D95F214D2391D003F00A1 /* MainViewController.xib in Resources */,
 				0207DA581B56EA530066E2B4 /* Images.xcassets in Resources */,
 				6AFF5BF91D6E424B00AB3073 /* CDVLaunchScreen.storyboard in Resources */,
+				028DBE6646A04659BF1154DC /* DatePicker.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,6 +362,7 @@
 				4A11267AD6434439969CF03C /* CDVWKProcessPoolFactory.m in Sources */,
 				5717DE31E2AE419C913102E2 /* IONAssetHandler.m in Sources */,
 				6EE1870C472A46A29EEA0C10 /* CDVIonicKeyboard.m in Sources */,
+				909D3FD3E3464347A9F210B8 /* DatePicker.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

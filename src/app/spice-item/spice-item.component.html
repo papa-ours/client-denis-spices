@@ -3,6 +3,9 @@
     <ion-checkbox slot="start" [checked]="selected"></ion-checkbox>
     <ion-label>{{label}}</ion-label>
     <ion-label>{{type.label}}</ion-label>
+    <ion-label>
+      <ion-icon *ngIf="printed" slot="end" size="large" name="checkmark-circle"></ion-icon>
+    </ion-label>
     <ion-thumbnail *ngIf="imageSource !== '-1'; else loader" slot="end">
       <img *ngIf="imageSource" src={{imageSource}}/>
     </ion-thumbnail>

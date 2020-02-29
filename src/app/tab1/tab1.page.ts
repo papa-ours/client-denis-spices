@@ -5,7 +5,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { SPICE_TYPES } from '../spice-types';
 import { EditComponent } from '../edit/edit.component';
-import { ModalController, ToastController } from '@ionic/angular';
+import { ModalController, ToastController, Platform } from '@ionic/angular';
 import { FilterComponent } from '../filter/filter.component';
 import { PrintComponent } from '../print/print.component';
 import { FilterService } from '../filter.service';
@@ -21,9 +21,11 @@ export class Tab1Page implements OnInit {
   public sortColumn: string;
   public sortDirection: number;
   public spices: Spice[];
+  public activeSpices: Spice[];
   public pageCount: number;
   public currentPage: number;
   public loading: boolean;
+  public width: number;
 
   constructor(
     private service: SpiceService,
@@ -31,8 +33,10 @@ export class Tab1Page implements OnInit {
     private modalCtrl: ModalController,
     public filterService: FilterService,
     private toastController: ToastController,
+    private platform: Platform,
   ) {
     this.spices = [];
+    this.activeSpices = [];
     this.sortColumn = "label";
     this.sortDirection = 1;
     this.initPages();
@@ -41,6 +45,7 @@ export class Tab1Page implements OnInit {
 
   public ngOnInit(): void {
     this.getSpices();
+    this.width = this.platform.width();
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
     ).subscribe(
@@ -65,7 +70,8 @@ export class Tab1Page implements OnInit {
     if (this.currentPage < 0) {
       this.currentPage = 0;
     }
-    this.getSpices();
+
+    this.setActiveSpices();
   }
 
   public setSort(column: string): void {
@@ -123,7 +129,7 @@ export class Tab1Page implements OnInit {
   public getSpices(): void {
     this.spices = [];
     this.loading = true;
-    this.service.getSpices(this.currentPage * this.SPICE_PER_PAGE, this.SPICE_PER_PAGE).subscribe((spices: Spice[]) => {
+    this.service.getSpices().subscribe((spices: Spice[]) => {
       const oldSpices: Spice[] = this.spices;
       this.spices = spices;
       this.spices.forEach((spice: Spice) => {
@@ -133,8 +139,13 @@ export class Tab1Page implements OnInit {
         }
       });
       this.sortSpices();
+      this.setActiveSpices();
       this.loading = false;
     });
+  }
+
+  public setActiveSpices(): void {
+    this.activeSpices = this.spices.slice(this.currentPage * this.SPICE_PER_PAGE, this.currentPage * this.SPICE_PER_PAGE + this.SPICE_PER_PAGE);
   }
 
   public async showFilterOptions(): Promise<void> {

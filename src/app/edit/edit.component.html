@@ -4,54 +4,57 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <form (ngSubmit)="onSubmit()">  
-    <ion-list>
-      <ion-item>
-        <ion-label position="stacked">Nom</ion-label>
-        <ion-input name="label" [value]="spice.label" type="text" placeholder="Entrer le nom de l'épice" (ionChange)="updateLabel($event)"></ion-input>
-      </ion-item>
-      
-      <ion-item>
-        <ion-label>Image</ion-label>
-        <ion-spinner *ngIf="loading" size="sm" name="lines-small"></ion-spinner>
-        <ion-button (click)="chooseFile()">
-          <ion-icon slot="start" name="download"></ion-icon>
-          Importer
-        </ion-button>
-        <ion-button (click)="loadImages()" [disabled]="spice.label == ''">
-          <ion-icon slot="start" name="refresh-circle"></ion-icon>
-          Rafraîchir
-        </ion-button>
-      </ion-item>
-      <ion-item class="images-container">
-        <div *ngFor="let src of imageSources; let ind=index" class="image-item" [style.left.px]="ind * 80">
-          <img [src]="src" [class.selected]="src===selectedImage" (click)="selectedImage=src"/>
-          <p (click)="showImageAlert(src)" class="image-label">
-            {{parseSourceToImageLabel(src) ? parseSourceToImageLabel(src) : 'Preview'}}
-          </p>
-        </div>
-        <ion-label *ngIf="noResults && imageSources.length === 0" color="danger">Aucun résultats</ion-label>
-      </ion-item>
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">Nom</ion-label>
+      <ion-input name="label" [value]="spice.label" type="text" placeholder="Entrer le nom de l'épice" (ionChange)="updateLabel($event)"></ion-input>
+    </ion-item>
+    
+    <ion-item>
+      <ion-label>Image</ion-label>
+      <ion-spinner *ngIf="loading" size="sm" name="lines-small"></ion-spinner>
+      <ion-button (click)="chooseFile()">
+        <ion-icon slot="start" name="download"></ion-icon>
+        Importer
+      </ion-button>
+      <ion-button (click)="loadImages()" [disabled]="spice.label == ''">
+        <ion-icon slot="start" name="refresh-circle"></ion-icon>
+        Rafraîchir
+      </ion-button>
+    </ion-item>
+    <ion-item class="images-container">
+      <div *ngFor="let src of imageSources; let ind=index" class="image-item" [style.left.px]="ind * 80">
+        <img [src]="src" [class.selected]="src===selectedImage" (click)="selectedImage=src"/>
+        <p (click)="showImageAlert(src)" class="image-label">
+          {{parseSourceToImageLabel(src) ? parseSourceToImageLabel(src) : 'Preview'}}
+        </p>
+      </div>
+      <ion-label *ngIf="noResults && imageSources.length === 0" color="danger">Aucun résultats</ion-label>
+    </ion-item>
 
-      <ion-item *ngIf="!isAdd" (click)="spice.printed = !spice.printed">
-        <ion-label>Imprimé</ion-label>
-        <ion-checkbox slot="start" [checked]="spice.printed"></ion-checkbox>
-      </ion-item>
-      
-      <ion-list>
-        <ion-list-header>
-          <ion-label>Type</ion-label>
-        </ion-list-header>
-        <ion-radio-group name="type" [value]="spice.type.value" (ionChange)="updateType($event)">
-          <ion-item *ngFor="let type of spiceTypes">
-            <ion-label>{{type.label}}</ion-label>
-            <ion-radio slot="start" [value]="type.value"></ion-radio>
-          </ion-item>
-        </ion-radio-group>
-      </ion-list>
+    <ion-item *ngIf="!isAdd" (click)="spice.printed = !spice.printed">
+      <ion-label>Imprimé</ion-label>
+      <ion-checkbox slot="start" [checked]="spice.printed"></ion-checkbox>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Date de péremption</ion-label>
+      <ion-datetime display-format="MMM YYYY" [(ngModel)]="spice.expirationDate" cancelText="Annuler" doneText="OK" placeholder="Date de péremption" max="2050" monthShortNames="JAN,FÉV,MAR,AVR,MAI,JUIN,JUIL,AOÛT,SEP,OCT,NOV,DÉC"></ion-datetime>
+    </ion-item>
+
+    <ion-list>
+      <ion-list-header>
+        <ion-label>Type</ion-label>
+      </ion-list-header>
+      <ion-radio-group name="type" [value]="spice.type.value" (ionChange)="updateType($event)">
+        <ion-item *ngFor="let type of spiceTypes">
+          <ion-label>{{type.label}}</ion-label>
+          <ion-radio slot="start" [value]="type.value"></ion-radio>
+        </ion-item>
+      </ion-radio-group>
     </ion-list>
-  </form>
-</ion-content>  
+  </ion-list>
+</ion-content>
 <ion-footer>
   <ion-toolbar>
     <ion-button class="ion-float-right" color="primary" (click)="onSubmit()">

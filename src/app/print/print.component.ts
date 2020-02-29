@@ -25,7 +25,8 @@ export class PrintComponent implements OnInit {
   public topPadding: number;
   public circleLeftDistance: number;
   public circleTopDistance: number;
-  public circleDiameter: number;
+  public itemWidth: number;
+  public itemHeight: number;
   public imageSize: number;
   public width: number;
   public height: number;
@@ -53,7 +54,8 @@ export class PrintComponent implements OnInit {
     this.topPadding = 94.5;
     this.circleLeftDistance = 144;
     this.circleTopDistance = 120;
-    this.circleDiameter = 117;
+    this.itemWidth = 117;
+    this.itemHeight = 117;
     this.imageSize = 40;
     this.width = 612;
     this.height = 792;
@@ -160,10 +162,10 @@ export class PrintComponent implements OnInit {
     }
   }
 
-  private async getRoundImage(label: string): Promise<p5.Image> {
+  private async getRoundImage(_id: string): Promise<p5.Image> {
     return new Promise((resolve, reject) => {
       this.p5.loadImage(
-        `${SERVER}spice/image/content/${label}`,
+        `${SERVER}spice/image/content/${_id}`,
         (image: p5.Image) => {
           image.mask(this.mask);
           resolve(image);
@@ -184,16 +186,16 @@ export class PrintComponent implements OnInit {
     this.p5.fill(color);
     this.p5.ellipseMode(this.p5.CENTER);
     this.p5.noStroke();
-    this.p5.ellipse(pos.x, pos.y, this.circleDiameter);
+    this.p5.ellipse(pos.x, pos.y, this.itemWidth, this.itemHeight);
   }
 
-  private async drawImage(pos: {x: number, y: number}, label: string): Promise<void> {
+  private async drawImage(pos: {x: number, y: number}, _id: string): Promise<void> {
     this.p5.imageMode(this.p5.CENTER);
     try {
       this.p5.fill(255);
-      const imageY: number = pos.y + this.circleDiameter / 4;
+      const imageY: number = pos.y + this.itemHeight / 4;
       this.p5.ellipse(pos.x, imageY, this.imageSize, this.imageSize);
-      const image: p5.Image = await this.getRoundImage(label);
+      const image: p5.Image = await this.getRoundImage(_id);
       this.p5.image(image, pos.x, imageY, this.imageSize, this.imageSize);
     } catch {
       throw Error();
@@ -205,8 +207,8 @@ export class PrintComponent implements OnInit {
     this.p5.rectMode(this.p5.CENTER);
     this.p5.textSize(label.length > 30 ? 10 : label.length > 20 ? 12 : 14);
     this.p5.textAlign(this.p5.CENTER, this.p5.CENTER);
-    const textYPosition: number = imageAdded ? pos.y - this.circleDiameter / 6 : pos.y;
-    this.p5.text(label, pos.x, textYPosition, this.circleDiameter - 30, this.circleDiameter - 30);
+    const textYPosition: number = imageAdded ? pos.y - this.itemHeight / 6 : pos.y;
+    this.p5.text(label, pos.x, textYPosition, this.itemWidth - 30, this.itemHeight - 30);
   }
 
   private async drawSpice(spice: Spice, index: number): Promise<void> {
@@ -214,7 +216,7 @@ export class PrintComponent implements OnInit {
     await this.drawEllipse(pos, spice.type.color); 
     let imageAdded: boolean = true;
     try {
-      await this.drawImage(pos, spice.label);   
+      await this.drawImage(pos, spice._id);   
     } catch {
       imageAdded = false;
     }
