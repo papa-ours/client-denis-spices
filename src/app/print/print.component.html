@@ -1,7 +1,9 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Imprimer</ion-title>
-    <ion-buttons slot="end" *ngIf="ready">
+    <ion-title>
+      Imprimer
+    </ion-title>
+    <ion-buttons slot="end" *ngIf="ready && numberOfPages">
       <ion-button (click)="changePage(-1)" [disabled]="currentPage===0">
         <ion-icon slot="icon-only" name="caret-back-circle"></ion-icon>
       </ion-button>
@@ -10,6 +12,9 @@
       </ion-text>
       <ion-button (click)="changePage(1)" [disabled]="(currentPage + 1)===numberOfPages">
         <ion-icon slot="icon-only" name="caret-forward-circle"></ion-icon>
+      </ion-button>
+      <ion-button color="danger" (click)="ready=false">
+        <ion-icon slot="icon-only" name="close-circle"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -26,7 +31,12 @@
     </ion-item>
     <ion-item>
       <ion-label>Commencer à partir de </ion-label>
-      <ion-input type="number" [max]="max - 1" min="0" [(ngModel)]="indexOffset"></ion-input>
+      <ion-input type="number" min="0" [(ngModel)]="indexOffset"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Forme</ion-label>
+      <ion-icon [name]="shape == 'circle' ? 'ellipse' : 'ellipse-outline'" (click)="shape='circle'"></ion-icon>
+      <ion-icon [name]="shape == 'rect' ? 'square' : 'square-outline'" (click)="shape='rect'"></ion-icon>
     </ion-item>
   </ion-list>
   <ng-template #preview>
@@ -36,7 +46,7 @@
 
 <ion-footer>
   <ion-toolbar>
-    <ion-button (click)="ready ? save(currentPage) : generate()" expand="block" [disabled]="!mask">
+    <ion-button (click)="ready ? save(currentPage) : generate()" expand="block">
       <ion-spinner *ngIf="loading" name="lines-small"></ion-spinner>
       {{ready ? 'Sauvegarder (' + (currentPage + 1) + '/' + numberOfPages + ')' : 'Générer'}}
     </ion-button>

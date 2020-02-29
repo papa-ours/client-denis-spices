@@ -95,8 +95,8 @@ export class Tab1Page implements OnInit {
 
   private sortSpices(): void {
     this.spices.sort((spice1: Spice, spice2: Spice) => {
-      const val1: string = (this.sortColumn === 'label' ? spice1.label : spice1.type.label).replace('É', 'E');
-      const val2: string = (this.sortColumn === 'label' ? spice2.label : spice2.type.label).replace('É', 'E');
+      const val1: string = (this.sortColumn === 'label' ? spice1.label : this.sortColumn === 'printed' ? spice1.printed.toString() : spice1.type.label).replace('É', 'E');
+      const val2: string = (this.sortColumn === 'label' ? spice2.label : this.sortColumn === 'printed' ? spice2.printed.toString() : spice2.type.label).replace('É', 'E');
 
       if (this.sortDirection === -1) {
         return val1 < val2 ? 1 : -1;
@@ -104,6 +104,7 @@ export class Tab1Page implements OnInit {
         return val1 < val2 ? -1 : 1 ;
       }
     });
+    this.setActiveSpices();
   }
 
   public async addSpice(): Promise<void> {

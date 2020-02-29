@@ -69,8 +69,10 @@
             <ion-icon *ngIf="sortColumn === 'type' && sortDirection === -1" name="caret-down"></ion-icon>
             <ion-icon *ngIf="sortColumn === 'type' && sortDirection === 1" name="caret-up"></ion-icon>
           </ion-label>
-          <ion-label>
+          <ion-label class="sortable" [class.sort]="sortColumn === 'printed'" (click)="setSort('printed')">
             Imprimé
+            <ion-icon *ngIf="sortColumn === 'printed' && sortDirection === -1" name="caret-down"></ion-icon>
+            <ion-icon *ngIf="sortColumn === 'printed' && sortDirection === 1" name="caret-up"></ion-icon>
           </ion-label>
         </ion-item>
         <ion-list>
