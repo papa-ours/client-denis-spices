@@ -17,7 +17,14 @@ export class SpiceService {
     return new Observable<Spice[]>(subscriber => {
       this.http.get<any[]>(`${SERVER}/spice${this.filterService.encodedQuery}&offset=${offset}&limit=${limit}`).subscribe(response => {
         const spices: Spice[] = response.map((val: any) => {
-          return {label: val.label, type: SPICE_TYPES[val.type], printed: val.printed === 1, _id: val._id, expirationDate: val.expiration_date}
+          return {
+            label: val.label,
+            type: SPICE_TYPES[val.type],
+            printed: val.printed === 1,
+            _id: val._id,
+            expirationDate: val.expiration_date,
+            spicyLevel: val.spicy_level,
+          }
         });
         subscriber.next(spices);
       });
@@ -57,7 +64,15 @@ export class SpiceService {
   public updateSpice(_id: string, spice: Spice, image: string): Observable<void> {
     return this.http.put<void>(
       SERVER + "spice/update",
-      {_id: _id, label: spice.label, type: spice.type.value, image: image, printed: spice.printed ? 1 : 0, expiration_date: spice.expirationDate},
+      {
+        _id: _id,
+        label: spice.label,
+        type: spice.type.value,
+        image: image,
+        printed: spice.printed ? 1 : 0,
+        expiration_date: spice.expirationDate,
+        spicy_level: spice.spicyLevel,
+      },
       {headers: new HttpHeaders({'Content-Type': 'application/json'})}
     );
   }

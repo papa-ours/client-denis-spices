@@ -195,6 +195,20 @@ export class RectangleGeneratorService {
     this.p5.pop();
   }
 
+  private async drawSpicyLevel(pos: {x: number, y: number}, level: number | undefined): Promise<void> {
+    return new Promise((resolve) => {
+      if (level !== undefined) {
+        this.p5.fill(255);
+        this.p5.loadImage("../assets/icon/pepper-hot-solid.svg", (image: p5.Image) => {
+          this.p5.image(image, pos.x + 8, pos.y, 15, 15);
+          this.p5.textSize(15);
+          this.p5.text(level.toString(), pos.x - 8, pos.y);
+          resolve();
+        });
+      }
+    });
+  }
+
   private async drawSpice(spice: Spice, index: number): Promise<void> {
     const pos: {x: number, y: number} = this.getPosition(index);
     await this.drawRect(pos, spice.type.color); 
@@ -204,8 +218,15 @@ export class RectangleGeneratorService {
 
     for (let i = 0; i < this.numberOfImages; i++) {
       const itemPos: {x: number, y: number} = {x: pos.x + (i - 1) * this.itemWidth / this.numberOfImages, y: pos.y};
-      await this.drawImage(itemPos, spice._id);  
+      await this.drawImage(itemPos, spice._id);
       await this.drawLabel(itemPos, spice.label);
+    }
+
+    if (spice.type.value === 6) {
+      for (let i = 0; i < this.numberOfImages - 1; i++) {
+        const itemPos: {x: number, y: number} = {x: pos.x + Math.pow(-1, i) * this.itemWidth / (this.numberOfImages * 2), y: pos.y};
+        await this.drawSpicyLevel(itemPos, spice.spicyLevel);
+      }
     }
   }
 }

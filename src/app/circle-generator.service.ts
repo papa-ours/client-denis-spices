@@ -184,6 +184,20 @@ export class CircleGeneratorService {
     }
   }
 
+  private async drawSpicyLevel(pos: {x: number, y: number}, level: number | undefined): Promise<void> {
+    return new Promise((resolve) => {
+      if (level !== undefined) {
+        this.p5.fill(255);
+        this.p5.loadImage("../assets/icon/pepper-hot-solid.svg", (image: p5.Image) => {
+          this.p5.image(image, pos.x + 5, pos.y - (this.itemHeight / 2 - 15), 10, 10);
+          this.p5.textSize(10);
+          this.p5.text(level.toString(), pos.x - 8, pos.y - (this.itemHeight / 2 - 15));
+          resolve();
+        });
+      }
+    });
+  }
+
   private async drawLabel(pos: {x: number, y: number}, label: string, imageAdded: boolean): Promise<void> {
     this.p5.fill(255);
     this.p5.rectMode(this.p5.CENTER);
@@ -203,6 +217,9 @@ export class CircleGeneratorService {
       imageAdded = false;
     }
     this.drawLabel(pos, spice.label, imageAdded);
+    if (spice.type.value === 6) {
+      await this.drawSpicyLevel(pos, spice.spicyLevel);
+    }
   }
 
   public dismiss(): void {

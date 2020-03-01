@@ -8,4 +8,5 @@ export interface Spice {
     image?: string;
     printed?: boolean;
     expirationDate?: string;
+    spicyLevel?: number;
 }

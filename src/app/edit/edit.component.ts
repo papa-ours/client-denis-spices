@@ -30,6 +30,7 @@ export class EditComponent implements OnInit {
       label: "",
       type: SPICE_TYPES[0],
       expirationDate: "",
+      spicyLevel: 0,
     }
     this.imageSources = [];
     this.loading = false;
@@ -104,6 +105,8 @@ export class EditComponent implements OnInit {
       this.spice = {
         label: "",
         type: SPICE_TYPES[0],
+        expirationDate: "",
+        spicyLevel: 0,
       }
       this.imageSources = [];
       this.dismiss(true);

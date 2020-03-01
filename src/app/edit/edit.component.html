@@ -53,6 +53,16 @@
         </ion-item>
       </ion-radio-group>
     </ion-list>
+
+    <ion-item *ngIf="spice.type.value === 6">
+      <ion-label>Force</ion-label>
+      <ion-range
+        min="0" max="10"
+        pin="true" snaps="true" step="1"
+        ticks="true" [(ngModel)]="spice.spicyLevel"
+        color="danger">
+      </ion-range>
+    </ion-item>
   </ion-list>
 </ion-content>
 <ion-footer>

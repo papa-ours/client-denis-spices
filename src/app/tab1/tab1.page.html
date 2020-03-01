@@ -81,7 +81,13 @@
             <ion-label>{{loading ? ' Veuillez patienter' : 'Aucune épice ne correspond à ce filtre'}}</ion-label>
           </ion-item>
           <app-spice-item *ngFor="let spice of activeSpices; let ind=index"
-            [label]="spice.label" [type]="spice.type" [selected]="spice.selected" [printed]="spice.printed" [_id]="spice._id" [expirationDate]="spice.expirationDate"
+            [label]="spice.label"
+            [type]="spice.type"
+            [selected]="spice.selected"
+            [printed]="spice.printed"
+            [_id]="spice._id" 
+            [expirationDate]="spice.expirationDate"
+            [spicyLevel]="spice.spicyLevel"
             (click)="spice.selected=!spice.selected"
             (editEvent)="getSpices()">
           </app-spice-item>
