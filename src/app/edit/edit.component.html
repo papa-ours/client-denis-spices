@@ -39,7 +39,10 @@
 
     <ion-item>
       <ion-label>Date de péremption</ion-label>
-      <ion-datetime display-format="MMM YYYY" [(ngModel)]="spice.expirationDate" cancelText="Annuler" doneText="OK" placeholder="Date de péremption" max="2050" monthShortNames="JAN,FÉV,MAR,AVR,MAI,JUIN,JUIL,AOÛT,SEP,OCT,NOV,DÉC"></ion-datetime>
+      <ion-item>
+        <ion-datetime display-format="MMM YYYY" [(ngModel)]="spice.expirationDate" cancelText="Annuler" doneText="OK" placeholder="Date de péremption" max="2050" monthShortNames="JAN,FÉV,MAR,AVR,MAI,JUIN,JUIL,AOÛT,SEP,OCT,NOV,DÉC"></ion-datetime>
+      </ion-item>
+    <ion-icon *ngIf="spice.expirationDate" (click)="spice.expirationDate=''" color="danger" slot="end" name="close-circle"></ion-icon>
     </ion-item>
 
     <ion-list>

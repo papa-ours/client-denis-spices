@@ -16,7 +16,7 @@ export class SpiceItemComponent implements OnInit, Spice {
 
   @Input() public label: string;
   @Input() public type: SpiceType;
-  @Input() public printed: boolean;
+  @Input() public printed: string;
   @Input() public spicyLevel: number;
   @Input() public expirationDate: string;
   @Input() public _id: string;

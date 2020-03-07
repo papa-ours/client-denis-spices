@@ -4,14 +4,10 @@ import { Spice } from '../spice';
 import { SERVER } from '../server';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ModalController, Platform } from '@ionic/angular';
-import { SpiceService } from '../spice.service';
 import { CircleGeneratorService } from '../circle-generator.service';
 import { RectangleGeneratorService } from '../rectangle-generator.service';
-
-interface Preview {
-  safeUrl: SafeUrl;
-  data: string;
-}
+import { Preview } from '../preview';
+import { SpiceService } from '../spice.service';
 
 enum Shape {
   RECT = "rect",
@@ -43,6 +39,7 @@ export class PrintComponent implements OnInit {
     private circleGenerator: CircleGeneratorService,
     private rectangleGenerator: RectangleGeneratorService,
     private platform: Platform,
+    private service: SpiceService,
   ) {
     this.spices = [];
     this.ready = false;
@@ -94,8 +91,18 @@ export class PrintComponent implements OnInit {
   }
 
   public save(page: number): void {
-    this.p5.loadImage(this.previewData[page].data, (image: p5.Image) => {
+    const preview: Preview = this.previewData[page];
+    this.p5.loadImage(preview.data, (image: p5.Image) => {
       this.p5.save(image, "epice-" + this.shape.toString() + page + ".png");
+
+      preview.spices.forEach((spice: Spice) => {  
+        const shapeIndex: number = this.shape === Shape.CIRCLE ? 0 : 1;
+        const values: string[] = spice.printed.split("");
+        values[shapeIndex] = "1";
+        spice.printed = values.join("");
+
+        this.service.updateSpice(spice._id, spice, "").subscribe();
+      });
     })
   }
 

@@ -3,8 +3,9 @@
     <ion-checkbox slot="start" [checked]="selected"></ion-checkbox>
     <ion-label>{{label}}</ion-label>
     <ion-label>{{type.label}}</ion-label>
-    <ion-label>
-      <ion-icon *ngIf="printed" slot="end" size="large" name="checkmark-circle"></ion-icon>
+    <ion-label class="printed-col">
+      <ion-icon size="large" [name]="printed[0] == '1' ? 'ellipse' : 'ellipse-outline'"></ion-icon>
+      <ion-icon size="large" [name]="printed[1] == '1' ? 'square' : 'square-outline'"></ion-icon>
     </ion-label>
     <ion-thumbnail *ngIf="imageSource !== '-1'; else loader" slot="end">
       <img *ngIf="imageSource" src={{imageSource}}/>

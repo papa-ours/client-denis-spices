@@ -3,11 +3,7 @@ import * as p5 from 'p5';
 import { Spice } from './spice';
 import { SERVER } from './server';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-
-interface Preview {
-  safeUrl: SafeUrl;
-  data: string;
-}
+import { Preview } from './preview';
 
 @Injectable({
   providedIn: 'root'
@@ -83,6 +79,7 @@ export class RectangleGeneratorService {
                               this.spices.slice(index, index + this.max);
       const startIndex: number = page === 0 ? this.indexOffset : 0;
       this.previewData[page] = await this.generatePage(spices, startIndex);
+      this.previewData[page].spices = this.spices;  
       page++;
     }
 

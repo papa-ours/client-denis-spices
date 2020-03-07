@@ -6,7 +6,7 @@ export interface Spice {
     type: SpiceType;
     selected?: boolean;
     image?: string;
-    printed?: boolean;
+    printed?: string;
     expirationDate?: string;
     spicyLevel?: number;
 }

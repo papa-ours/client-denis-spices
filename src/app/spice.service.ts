@@ -20,7 +20,7 @@ export class SpiceService {
           return {
             label: val.label,
             type: SPICE_TYPES[val.type],
-            printed: val.printed === 1,
+            printed: val.printed,
             _id: val._id,
             expirationDate: val.expiration_date,
             spicyLevel: val.spicy_level,
@@ -69,7 +69,7 @@ export class SpiceService {
         label: spice.label,
         type: spice.type.value,
         image: image,
-        printed: spice.printed ? 1 : 0,
+        printed: spice.printed,
         expiration_date: spice.expirationDate,
         spicy_level: spice.spicyLevel,
       },
