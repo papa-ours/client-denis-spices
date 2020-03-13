@@ -50,6 +50,7 @@ export class CircleGeneratorService {
 
   public async generate(spices: Spice[], clientP5: p5, offset: number, params: TemplateParams): Promise<Preview[]> {
     this.params = params;
+    this.previewData = [];
     this.indexOffset = offset;
     this.p5 = clientP5;
     this.spices = spices;

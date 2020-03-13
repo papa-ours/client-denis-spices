@@ -50,6 +50,7 @@ export class RectangleGeneratorService {
   }
 
   public async generate(spices: Spice[], clientP5: p5, offset: number, params: TemplateParams): Promise<Preview[]> {
+    this.previewData = [];
     this.params = params;
     this.indexOffset = offset;
     this.p5 = clientP5;
