@@ -233,7 +233,7 @@ export class RectangleGeneratorService {
       await this.drawLabel(itemPos, spice.label);
     }
 
-    if (spice.type.value === 6) {
+    if (spice.type.value === 6 && spice.spicyLevel) {
       for (let i = 0; i < this.numberOfImages - 1; i++) {
         const itemPos: {x: number, y: number} = {x: pos.x + Math.pow(-1, i) * this.params.itemWidth.value / (this.numberOfImages * 2), y: pos.y};
         await this.drawSpicyLevel(itemPos, spice.spicyLevel);

@@ -216,7 +216,7 @@ export class CircleGeneratorService {
       throw error;
     }
     await this.drawLabel(pos, spice.label, imageAdded);
-    if (spice.type.value === 6) {
+    if (spice.type.value === 6 && spice.spicyLevel) {
       await this.drawSpicyLevel(pos, spice.spicyLevel);
     }
   }
