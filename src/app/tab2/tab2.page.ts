@@ -194,7 +194,9 @@ export class Tab2Page implements OnInit {
   }
 
   public async submit(): Promise<void> {
-    if (this.templateNames.includes(this.params.name.value)) {
+    if (this.params.name.value === "") {
+      this.showToast("Le gabarit doit avoir un nom", "danger");
+    } else if (this.templateNames.includes(this.params.name.value)) {
       this.confirmUpdate();
     } else {
       this.save();
@@ -209,11 +211,15 @@ export class Tab2Page implements OnInit {
   }
 
   public async showSavedToast(): Promise<void> {
+    this.showToast("Gabarit sauvegardé avec succès", "success");
+  }
+
+  public async showToast(message: string, color: string = "primary") {
     const toast: HTMLIonToastElement = await this.toastController.create({
-      message: "Gabarit sauvegardé avec succès",
+      message: message,
       duration: 2200,
       position: 'bottom',
-      color: 'success',
+      color: color,
       showCloseButton: true,
       closeButtonText: 'OK',
     });
