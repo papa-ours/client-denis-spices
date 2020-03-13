@@ -33,10 +33,16 @@
       <ion-label>Commencer à partir de </ion-label>
       <ion-input type="number" min="0" [(ngModel)]="indexOffset"></ion-input>
     </ion-item>
-    <ion-item>
+    <!-- <ion-item>
       <ion-label>Forme</ion-label>
       <ion-icon [name]="shape == 'circle' ? 'ellipse' : 'ellipse-outline'" (click)="shape='circle'"></ion-icon>
       <ion-icon [name]="shape == 'rect' ? 'square' : 'square-outline'" (click)="shape='rect'"></ion-icon>
+    </ion-item> -->
+    <ion-item *ngIf="templateNames">
+      <ion-label>Gabarit</ion-label>
+      <ion-select multiple="false" placeholder="Sélectionnez un gabarit" interface="popover" [(ngModel)]="selectedTemplateIndex">
+        <ion-select-option *ngFor="let name of templateNames; index as i" [value]="i">{{name}}</ion-select-option>
+      </ion-select>
     </ion-item>
   </ion-list>
   <ng-template #preview>

@@ -8,11 +8,9 @@ import { CircleGeneratorService } from '../circle-generator.service';
 import { RectangleGeneratorService } from '../rectangle-generator.service';
 import { Preview } from '../preview';
 import { SpiceService } from '../spice.service';
-
-enum Shape {
-  RECT = "rect",
-  CIRCLE = "circle",
-}
+import { Shape } from '../shape';
+import { TemplateService } from '../template.service';
+import { TemplateParams } from '../template-params';
 
 @Component({
   selector: 'app-print',
@@ -33,13 +31,17 @@ export class PrintComponent implements OnInit {
   public currentPage: number;
   public qualityWarning: boolean;
   public shape: Shape;
-  
+  public templates: TemplateParams[];
+  public templateNames: string[];
+  public selectedTemplateIndex: number;
+
   constructor(
     private modalController: ModalController,
     private circleGenerator: CircleGeneratorService,
     private rectangleGenerator: RectangleGeneratorService,
     private platform: Platform,
     private service: SpiceService,
+    private templateService: TemplateService,
   ) {
     this.spices = [];
     this.ready = false;
@@ -54,12 +56,25 @@ export class PrintComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.p5 = new p5((p5: p5) => this.sketch(p5), document.getElementById("preview-canvas"));
+    this.p5 = new p5((p5: p5) => this.sketch(p5));
+    this.getTemplates();
     this.platform.ready().then(() => {
       if (this.platform.is("desktop")) {
         this.p5.pixelDensity(6);
       } else {
         this.qualityWarning = true;
+      }
+    });
+  }
+
+  public getTemplates(): void {
+    this.templateService.getTemplates().subscribe((templates: TemplateParams[]) => {
+      this.templates = templates;
+      this.templateNames = templates.map((template: TemplateParams) => template.name.value);
+      if (this.templates.length) {
+        if (!this.selectedTemplateIndex) {
+          this.selectedTemplateIndex = 0;
+        }
       }
     });
   }
@@ -81,10 +96,10 @@ export class PrintComponent implements OnInit {
   public async generate(): Promise<void> {
     this.currentPage = 0;
     this.loading = true;
-    if (this.shape === Shape.CIRCLE) {
-      this.previewData = await this.circleGenerator.generate(this.spices, this.p5, this.indexOffset);
-    } else if (this.shape === Shape.RECT) {
-      this.previewData = await this.rectangleGenerator.generate(this.spices, this.p5, this.indexOffset);
+    if (this.templates[this.selectedTemplateIndex].shape.value === Shape.CIRCLE) {
+      this.previewData = await this.circleGenerator.generate(this.spices, this.p5, this.indexOffset, this.templates[this.selectedTemplateIndex]);
+    } else if (this.templates[this.selectedTemplateIndex].shape.value === Shape.RECT) {
+      this.previewData = await this.rectangleGenerator.generate(this.spices, this.p5, this.indexOffset, this.templates[this.selectedTemplateIndex]);
     }
     this.loading = false;
     this.ready = true;
@@ -100,7 +115,6 @@ export class PrintComponent implements OnInit {
         const values: string[] = spice.printed.split("");
         values[shapeIndex] = "1";
         spice.printed = values.join("");
-
         this.service.updateSpice(spice._id, spice, "").subscribe();
       });
     })

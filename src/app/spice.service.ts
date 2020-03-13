@@ -40,7 +40,7 @@ export class SpiceService {
   }
 
   public getSpiceCount(): Observable<number> {
-    return this.http.get<number>(`${SERVER}/spice/count${this.filterService.encodedQuery}`);
+    return this.http.get<number>(`${SERVER}spice/count${this.filterService.encodedQuery}`);
   }
 
   public loadImages(label: string): Observable<string[]> {

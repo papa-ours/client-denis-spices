@@ -1,42 +1,219 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { TemplateParams } from '../template-params';
+import * as p5 from 'p5';
+import { Shape } from '../shape';
+import { Preview } from '../preview';
+import { CircleGeneratorService } from '../circle-generator.service';
+import { RectangleGeneratorService } from '../rectangle-generator.service';
 import { Spice } from '../spice';
 import { SPICE_TYPES } from '../spice-types';
 import { SpiceType } from '../spice-type';
-import { ToastController } from '@ionic/angular';
-import { SpiceService } from '../spice.service';
-import { Router } from '@angular/router';
+import { TemplateService } from '../template.service';
+import { AlertController, ToastController, Platform } from '@ionic/angular';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss']
 })
-export class Tab2Page {
-
-  public spice: Spice;
-  public readonly spiceTypes: SpiceType[] = SPICE_TYPES;
-  public imageSources: string[];
+export class Tab2Page implements OnInit {
+  private readonly fields: string[][] = [
+    [
+      "name",
+      "rowCount",
+      "colCount",
+      "leftPadding",
+      "topPadding",
+      "itemLeftDistance",
+      "itemTopDistance",
+      "itemWidth",
+      "itemHeight",
+    ], 
+    [
+      "fontSize",
+      "labelOffsetX",
+      "labelOffsetY",
+      "imageSize",
+      "imageOffsetX",
+      "imageOffsetY",
+      "shape",
+    ],
+  ];
+  private p5: p5;
+  private width: number;
+  private height: number;
+  public font: p5.Font;
+  public ready: boolean;
+  public previewData: Preview;
   public loading: boolean;
-  public noResults: boolean;
-  public selectedImage: string;
+  public templates: TemplateParams[];
+  public templateNames: string[];
+  public selectedTemplateIndex: number;
+  public selectedName: string;
+  private screenWidth: number;
 
-  constructor(private toastController: ToastController, private service: SpiceService, private router: Router) {
-    this.spice = {
-      label: "",
-      type: SPICE_TYPES[0],
-    }
-    this.imageSources = [];
+  public constructor(
+    private circleGenerator: CircleGeneratorService,
+    private rectangleGenerator: RectangleGeneratorService,
+    private toastController: ToastController,
+    private alertController: AlertController,
+    private service: TemplateService,
+    private platform: Platform,
+  ) {
+    this.width = 612;
+    this.height = 792;
     this.loading = false;
-    this.noResults = false;
-    this.selectedImage = "";
+    this.selectedTemplateIndex = -1;
+  }
+  
+  public ngOnInit(): void {
+    this.initP5().then(() => {
+      this.getTemplates();
+    });
+    this.screenWidth = this.platform.width();
   }
 
-  private async showToast(message: string): Promise<void> {
+  @HostListener('window:resize', ['$event'])
+  public onResize(): void {
+    this.screenWidth = this.platform.width();
+  }
+
+  public get flatFields(): string[] {
+    return this.fields[0].concat(this.fields[1]);
+  }
+
+  private async initP5(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      this.p5 = new p5(async (p5: p5) => {
+        await this.sketch(p5);
+        resolve();
+      });
+    });
+  }
+
+  public getTemplates(): void {
+    this.service.getTemplates().subscribe((templates: TemplateParams[]) => {
+      this.templates = templates;
+      this.templateNames = templates.map((template: TemplateParams) => template.name.value);
+      if (this.templates.length) {
+        if (this.selectedName) {
+          this.selectedTemplateIndex = this.templateNames.findIndex((name: string) => name === this.selectedName);
+        }
+        if (this.selectedTemplateIndex === undefined || this.selectedTemplateIndex < 0) {
+          this.selectedTemplateIndex = 0;
+        }
+        this.generate();
+      }
+    });
+  }
+
+  private async sketch(p5: p5): Promise<void> {
+    return new Promise<void>((resolve) => {
+      p5.preload = () => {
+        this.font = p5.loadFont("../../assets/font/Gobold Regular.otf");
+      }
+  
+      p5.setup = () => {
+        p5.textFont(this.font);
+        p5.createCanvas(this.width, this.height);
+        p5.fill(255);
+        resolve();
+      }
+    });
+  }
+
+  private get numberOfSpices(): number {
+    return this.params.colCount.value * this.params.rowCount.value;
+  }
+
+  private getRandomSpiceType(): SpiceType {
+    return SPICE_TYPES[Math.floor(Math.random() * SPICE_TYPES.length)];
+  }
+
+  private getMockSpices(): Spice[] {
+    const spices: Spice[] = [];
+    for (let i = 0; i < this.numberOfSpices; i++) {
+      const spice: Spice = {
+        _id: "-1",
+        label: (Math.random() > 0.33 ? Math.random() > 0.66 ? "Long nom d'épice #" : "Très très long nom pour l'épice #" : "Épice #") + (i + 1),
+        type: this.getRandomSpiceType(),
+      };
+
+      if (spice.type.value === 6) {
+        spice.spicyLevel = Math.floor(Math.random() * 10);
+      }
+      spices.push(spice);
+    }
+
+    return spices;
+  }
+
+  public get params(): TemplateParams {
+    return this.templates[this.selectedTemplateIndex];
+  }
+
+  public async generate(): Promise<void> {
+    this.loading = true;
+    try {
+      if (this.params.shape.value == Shape.CIRCLE) {
+        this.previewData = (await this.circleGenerator.generate(this.getMockSpices(), this.p5, 0, this.params))[0];
+      } else if (this.params.shape.value == Shape.RECT) {
+        this.previewData = (await this.rectangleGenerator.generate(this.getMockSpices(), this.p5, 0, this.params))[0];
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+    this.loading = false;
+    this.ready = true;
+  }
+
+  public async confirmUpdate(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: "Écraser",
+      message: this.params.name.value,
+      buttons: [
+        {
+          text: 'Non',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            this.alertController.dismiss();
+          }
+        }, {
+          text: 'Oui',
+          handler: () => {
+            this.update();
+            this.alertController.dismiss();
+          }
+        }
+      ]
+    });
+  
+    await alert.present();
+  }
+
+  public async submit(): Promise<void> {
+    if (this.templateNames.includes(this.params.name.value)) {
+      this.confirmUpdate();
+    } else {
+      this.save();
+    }
+  }
+
+  public async update(): Promise<void> {
+    this.service.updateTemplate(this.params).subscribe(async () => {
+      this.selectedName = this.params.name.value;
+      this.getTemplates();
+    });
+  }
+
+  public async showSavedToast(): Promise<void> {
     const toast: HTMLIonToastElement = await this.toastController.create({
-      message: message,
+      message: "Gabarit sauvegardé avec succès",
       duration: 2200,
       position: 'bottom',
-      color: 'danger',
+      color: 'success',
       showCloseButton: true,
       closeButtonText: 'OK',
     });
@@ -44,61 +221,34 @@ export class Tab2Page {
     toast.present();
   }
 
-  public onSubmit(changeView: boolean = false) {
-    this.spice.label = this.spice.label.trim();
-    if (this.spice.label === "") {
-      this.showToast('Le nom ne doit pas être vide');
-      return;
-    }
-
-    if (this.selectedImage === "") {
-      this.showToast('Veuillez sélectionner une image');
-      return;
-    }
-
-    this.service.createSpice(this.spice, this.selectedImage).subscribe(async () => {
-      this.service.getSpices(0, 0);
-      this.spice = {
-        label: "",
-        type: SPICE_TYPES[0],
-      }
-      this.imageSources = [];
-      if (changeView) {
-        this.router.navigateByUrl("/tabs/all");
-      } else {
-        const toast: HTMLIonToastElement = await this.toastController.create({
-          message: 'Épice ajoutée',
-          duration: 2200,
-          position: 'bottom',
-          color: 'success',
-          showCloseButton: true,
-          closeButtonText: 'OK',
-        });
-    
-        toast.present();
-      }
+  public async save(): Promise<void> {
+    this.service.saveTemplate(this.params).subscribe(async () => {
+      this.selectedName = this.params.name.value;
+      this.getTemplates();
     });
   }
 
-  public updateLabel($event: CustomEvent) {
-    this.spice.label = $event.detail.value;
-  }
-
-  public updateType($event: CustomEvent) {
-    this.spice.type = this.spiceTypes[$event.detail.value];
-  }
-
-  public loadImages(): void {
-    this.loading = true;
-    this.service.loadImages(this.spice.label).subscribe((paths: string[]) => {
-      this.imageSources = paths.filter((path: string) => path !== '');
-      this.noResults = this.imageSources.length === 0;
-      this.loading = false;
+  public async delete(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: "Supprimer",
+      message: this.params.name.value,
+      buttons: [
+        {
+          text: 'Non',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            this.alertController.dismiss();
+          }
+        }, {
+          text: 'Oui',
+          handler: () => {
+            this.service.deleteTemplate(this.params._id).subscribe(() => this.getTemplates());
+            this.alertController.dismiss();
+          }
+        }
+      ]
     });
-  }
-
-  public parseSourceToImageLabel(source: string): string {
-    source = source.replace(".jpg", "");
-    return source.substr(source.lastIndexOf("/") + 1).split("-").join(" ");
+    await alert.present();
   }
 }

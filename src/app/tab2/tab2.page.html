@@ -1,53 +1,100 @@
+<ion-toolbar>
+  <ion-title>Les épices à Denis</ion-title>
+</ion-toolbar>
+<ion-toolbar>
+  <ion-item *ngIf="templateNames">
+    <ion-label>Gabarit</ion-label>
+    <ion-select multiple="false" placeholder="Sélectionnez un gabarit" interface="popover" [(ngModel)]="selectedTemplateIndex">
+      <ion-select-option *ngFor="let name of templateNames; index as i" [value]="i">{{name}}</ion-select-option>
+    </ion-select>
+  </ion-item>
+  <ion-buttons slot="end">
+    <ion-button (click)="delete()" color="danger">
+      <ion-icon slot="icon-only" name="trash"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</ion-toolbar>
 <ion-content>
-  <ion-grid fixed>
+  <ion-grid *ngIf="screenWidth > 650">
     <ion-row>
-      <ion-col size-md="3" size-sm="1" size-xs="0"></ion-col>
-      <ion-col size-md="6" size-sm="10" size-xs="12">
-        <form (ngSubmit)="onSubmit()">  
-          <ion-list>
-            <ion-item>
-              <ion-label position="stacked">Nom</ion-label>
-              <ion-input name="label" [value]="spice.label" type="text" placeholder="Entrer le nom de l'épice" (ionChange)="updateLabel($event)"></ion-input>
-            </ion-item>
-
-            <ion-item>
-              <ion-label>Image</ion-label>
-              <ion-spinner *ngIf="loading" size="sm" name="lines-small"></ion-spinner>
-              <ion-button (click)="loadImages()" [disabled]="spice.label == ''">
-                <ion-icon slot="start" name="refresh-circle"></ion-icon>
-                Obtenir les images
-              </ion-button>
-            </ion-item>
-            <ion-item class="images-container">
-              <div *ngFor="let src of imageSources" class="image-item">
-                <img [src]="src" [class.selected]="src===selectedImage" (click)="selectedImage=src"/>
-                {{parseSourceToImageLabel(src)}}
-              </div>
-              <ion-label *ngIf="noResults" color="danger">Aucun résultats</ion-label>
-            </ion-item>
-        
-            <ion-list>
-              <ion-list-header>
-                <ion-label>Type</ion-label>
-              </ion-list-header>
-              <ion-radio-group name="type" [value]="spice.type.value" (ionChange)="updateType($event)">
-                <ion-item *ngFor="let type of spiceTypes">
-                  <ion-label>{{type.label}}</ion-label>
-                  <ion-radio slot="start" [value]="type.value"></ion-radio>
-                </ion-item>
-              </ion-radio-group>
-            </ion-list>
-          </ion-list>
-          <ion-button color="primary" type="submit">
-            Continuer
-          </ion-button>
-          <ion-button color="primary" (click)="onSubmit(true)">
-            Soumettre
-          </ion-button>
-        </form>
+      <ion-col size="6">
+        <ng-container *ngTemplateOutlet="paramscontainer"></ng-container>
       </ion-col>
-      <ion-col size-md="3" size-sm="1" size-xs="0"></ion-col>
+      <ion-col size="6">
+        <ng-container *ngTemplateOutlet="preview"></ng-container>
+      </ion-col>
     </ion-row>
   </ion-grid>
-
+  <ion-grid *ngIf="screenWidth <= 650">
+    <ion-row>
+      <ion-col size="12">
+        <ng-container *ngTemplateOutlet="paramscontainer"></ng-container>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="12">
+        <ng-container *ngTemplateOutlet="preview"></ng-container>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
+
+<ng-template #paramscontainer>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-subtitle>Paramètres</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content *ngIf="selectedTemplateIndex >= 0">
+      <ion-grid>
+        <ion-row *ngIf="screenWidth > 650">
+          <ion-col class="field-col" size="6" *ngFor="let col of fields">
+            <ng-container [ngTemplateOutlet]="parameters" [ngTemplateOutletContext]="{col:col}"></ng-container>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="screenWidth <= 650" >
+          <ion-col class="field-col" size="12">
+            <ng-container [ngTemplateOutlet]="parameters" [ngTemplateOutletContext]="{col:fields.flat()}"></ng-container>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <ion-button (click)="generate()" expand="block">
+        <ion-spinner *ngIf="loading" name="lines-small"></ion-spinner>
+        Aperçu
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ng-template>
+
+<ng-template #parameters let-col="col">
+  <ion-item *ngFor="let field of col">
+    <ion-label position="fixed">{{params[field].label}}</ion-label>
+    <ion-input *ngIf="field !== 'shape' && field !== 'name'" slot="end" type="number" [class.small]="width > 650" [(ngModel)]="params[field].value" (ionChange)="generate()"></ion-input>
+    <ng-container *ngIf="field==='shape'; else nameselection">
+      <ion-icon slot="end" [name]="params[field].value == 'circle' ? 'ellipse' : 'ellipse-outline'" (click)="params[field].value='circle'; generate()"></ion-icon>
+      <ion-icon slot="end" [name]="params[field].value == 'rect' ? 'square' : 'square-outline'" (click)="params[field].value='rect'; generate()"></ion-icon>
+    </ng-container>
+    <ng-container *ngIf="field==='name'">
+      <ion-input type="text" placeholder="Nom du template" [(ngModel)]="params[field].value"></ion-input>
+    </ng-container>
+  </ion-item>
+</ng-template>
+
+<ng-template #preview>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-subtitle>Aperçu</ion-card-subtitle>
+      <ion-card-title *ngIf="templates && templates.length">{{params.name.value ? params.name.value : 'Gabarit sans nom'}}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-text *ngIf="!previewData; else preview">
+        <h3>Aucun aperçu</h3>
+      </ion-text>
+      <ng-template #preview>
+        <img id="preview" [src]="previewData.safeUrl"/>
+        <ion-button (click)="submit()" expand="block">
+          Sauvegarder gabarit
+        </ion-button>
+      </ng-template>
+    </ion-card-content>
+  </ion-card>
+</ng-template>

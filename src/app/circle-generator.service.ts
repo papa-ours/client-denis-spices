@@ -5,25 +5,19 @@ import { SERVER } from './server';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ModalController } from '@ionic/angular';
 import { Preview } from './preview';
+import { TemplateParams } from './template-params';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CircleGeneratorService {
-  public rowCount: number;
-  public colCount: number;
-  public leftPadding: number;
-  public topPadding: number;
-  public circleLeftDistance: number;
-  public circleTopDistance: number;
-  public itemWidth: number;
-  public itemHeight: number;
-  public imageSize: number;
+  private params: TemplateParams;
   public width: number;
   public height: number;
   public indexOffset: number;
   public ready: boolean;
   public mask: p5.Image;
+  public mock: p5.Image;
   public loading: boolean;
   private p5: p5;
   public previewData: Preview[];
@@ -34,20 +28,10 @@ export class CircleGeneratorService {
   
   constructor(
     private sanitizer: DomSanitizer,
-    private modalController: ModalController,
   ) {
     this.spices = [];
     this.ready = false;
-    this.rowCount = 6;
-    this.colCount = 4;
     this.indexOffset = 0;
-    this.leftPadding = 90;
-    this.topPadding = 94.5;
-    this.circleLeftDistance = 144;
-    this.circleTopDistance = 120;
-    this.itemWidth = 117;
-    this.itemHeight = 117;
-    this.imageSize = 40;
     this.width = 612;
     this.height = 792;
     this.loading = false;
@@ -55,30 +39,22 @@ export class CircleGeneratorService {
     this.previewData = [];
     this.qualityWarning = false;
   }
-
-  public changePage(change: number): void {
-    this.currentPage += change;
-    if (this.currentPage === this.numberOfPages) {
-      this.currentPage = this.numberOfPages;
-    }
-    if (this.currentPage < 0) {
-      this.currentPage = 0;
-    }
-  }
   
   public get max(): number {
-    return this.colCount * this.rowCount;
+    return this.params.colCount.value * this.params.rowCount.value;
   }
 
   public get numberOfPages(): number {
     return Math.ceil((this.spices.length + this.indexOffset) / this.max);
   }
 
-  public async generate(spices: Spice[], clientP5: p5, offset: number): Promise<Preview[]> {
+  public async generate(spices: Spice[], clientP5: p5, offset: number, params: TemplateParams): Promise<Preview[]> {
+    this.params = params;
     this.indexOffset = offset;
     this.p5 = clientP5;
     this.spices = spices;
     await this.getMask();
+    await this.getMock();
     let page: number = 0;
     this.loading = true;
 
@@ -89,7 +65,7 @@ export class CircleGeneratorService {
                               this.spices.slice(index, index + this.max);
       const startIndex: number = page === 0 ? this.indexOffset : 0;
       this.previewData[page] = await this.generatePage(spices, startIndex);
-      this.previewData[page].spices = this.spices;
+      this.previewData[page].spices = spices;
       page++;
     }
 
@@ -135,6 +111,23 @@ export class CircleGeneratorService {
     });
   }
 
+  private async getMock(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.p5.loadImage(
+        "../assets/mock.png",
+        (image: p5.Image) => {
+          this.mock = image;
+          this.mock.mask(this.mask);
+          resolve();
+        },
+        (reason: any) => {
+          reject(reason);
+          throw Error();
+        },
+      )
+    }); 
+  }
+
   private async drawSpices(spices: Spice[], startIndex: number): Promise<void[]> {
     return Promise.all(
       spices.map((spice: Spice, index: number) => this.drawSpice(spice, startIndex + index)),
@@ -143,21 +136,25 @@ export class CircleGeneratorService {
 
   private async getRoundImage(_id: string): Promise<p5.Image> {
     return new Promise((resolve, reject) => {
-      this.p5.loadImage(
-        `${SERVER}spice/image/content/${_id}`,
-        (image: p5.Image) => {
-          image.mask(this.mask);
-          resolve(image);
-        },
-        () => reject(),
-      );
+      if (_id === "-1") {
+        resolve(this.mock);
+      } else {
+        this.p5.loadImage(
+          `${SERVER}spice/image/content/${_id}`,
+          (image: p5.Image) => {
+            image.mask(this.mask);
+            resolve(image);
+          },
+          () => reject(),
+        );
+      }
     });
   }
 
   private getPosition(index: number): {x: number, y: number} {
     return {
-      x: (index % this.colCount) * this.circleLeftDistance + this.leftPadding,
-      y: Math.floor(index / this.colCount) * this.circleTopDistance + this.topPadding,
+      x: (index % this.params.colCount.value) * this.params.itemLeftDistance.value + this.params.leftPadding.value,
+      y: Math.floor(index / this.params.colCount.value) * this.params.itemTopDistance.value + this.params.topPadding.value,
     };
   }
 
@@ -165,19 +162,18 @@ export class CircleGeneratorService {
     this.p5.fill(color);
     this.p5.ellipseMode(this.p5.CENTER);
     this.p5.noStroke();
-    this.p5.ellipse(pos.x, pos.y, this.itemWidth, this.itemHeight);
+    this.p5.ellipse(pos.x, pos.y, this.params.itemWidth.value, this.params.itemHeight.value);
   }
 
   private async drawImage(pos: {x: number, y: number}, _id: string): Promise<void> {
     this.p5.imageMode(this.p5.CENTER);
     try {
       this.p5.fill(255);
-      const imageY: number = pos.y + this.itemHeight / 4;
-      this.p5.ellipse(pos.x, imageY, this.imageSize, this.imageSize);
+      this.p5.ellipse(pos.x + this.params.imageOffsetX.value, pos.y + this.params.imageOffsetY.value, this.params.imageSize.value, this.params.imageSize.value);
       const image: p5.Image = await this.getRoundImage(_id);
-      this.p5.image(image, pos.x, imageY, this.imageSize, this.imageSize);
-    } catch {
-      throw Error();
+      this.p5.image(image, pos.x + this.params.imageOffsetX.value, pos.y + this.params.imageOffsetY.value, this.params.imageSize.value, this.params.imageSize.value);
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -185,12 +181,16 @@ export class CircleGeneratorService {
     return new Promise((resolve) => {
       if (level !== undefined) {
         this.p5.fill(255);
-        this.p5.loadImage("../assets/icon/pepper-hot-solid.svg", (image: p5.Image) => {
-          this.p5.image(image, pos.x + 5, pos.y - (this.itemHeight / 2 - 15), 10, 10);
-          this.p5.textSize(10);
-          this.p5.text(level.toString(), pos.x - 8, pos.y - (this.itemHeight / 2 - 15));
-          resolve();
-        });
+        this.p5.loadImage(
+          "../assets/icon/pepper-hot-solid.svg",
+          (image: p5.Image) => {
+            this.p5.image(image, pos.x + 5, pos.y - (this.params.itemHeight.value / 2 - 15), this.params.fontSize.value * 0.8, this.params.fontSize.value * 0.8);
+            this.p5.textSize(this.params.fontSize.value * 0.8);
+            this.p5.text(level.toString(), pos.x - 8, pos.y - (this.params.itemHeight.value / 2 - 15));
+            resolve();
+          });
+      } else {
+        resolve();
       }
     });
   }
@@ -198,10 +198,11 @@ export class CircleGeneratorService {
   private async drawLabel(pos: {x: number, y: number}, label: string, imageAdded: boolean): Promise<void> {
     this.p5.fill(255);
     this.p5.rectMode(this.p5.CENTER);
-    this.p5.textSize(label.length > 30 ? 10 : label.length > 20 ? 12 : 14);
+    const fontSizeRatio: number = label.length > 30 ? 0.7 : label.length > 20 ? 0.85 : 1
+    this.p5.textSize(fontSizeRatio * this.params.fontSize.value);
     this.p5.textAlign(this.p5.CENTER, this.p5.CENTER);
-    const textYPosition: number = imageAdded ? pos.y - this.itemHeight / 6 : pos.y;
-    this.p5.text(label, pos.x, textYPosition, this.itemWidth - 30, this.itemHeight - 30);
+    const textYPosition: number = imageAdded ? pos.y - this.params.itemHeight.value / 6 : pos.y;
+    this.p5.text(label, pos.x + this.params.labelOffsetX.value, textYPosition + this.params.labelOffsetY.value, this.params.itemWidth.value - 30, this.params.itemHeight.value - 30);
   }
 
   private async drawSpice(spice: Spice, index: number): Promise<void> {
@@ -210,16 +211,13 @@ export class CircleGeneratorService {
     let imageAdded: boolean = true;
     try {
       await this.drawImage(pos, spice._id);   
-    } catch {
+    } catch (error) {
       imageAdded = false;
+      throw error;
     }
-    this.drawLabel(pos, spice.label, imageAdded);
+    await this.drawLabel(pos, spice.label, imageAdded);
     if (spice.type.value === 6) {
       await this.drawSpicyLevel(pos, spice.spicyLevel);
     }
-  }
-
-  public dismiss(): void {
-    this.modalController.dismiss();
   }
 }

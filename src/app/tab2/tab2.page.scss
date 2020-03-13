@@ -1,33 +1,14 @@
-ion-spinner * {
-    width: 8px;
-    height: 8px;
+ion-input.small {
+    max-width: 60px;
+    float: right;
+    position: relative;
+    right: 0px;
 }
 
-img {
-    width: 60px;
+#preview {
     margin: auto;
-    cursor: pointer;
-    &:hover {
-        opacity: 80%;
-    }
-
-    &.selected {
-        border: solid 2px var(--ion-color-primary);
-        border-style: inset;
-    }
 }
 
-.images-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-}
-
-.image-item {
-    display: flex;
-    font-size: 14px;
-    flex-direction: column;
-    text-align: center;
-    justify-content: center;
-    align-content: center;
+ion-col.field-col:nth-of-type(1) {
+    border-right: solid 1px var(--ion-color-light-shade);
 }

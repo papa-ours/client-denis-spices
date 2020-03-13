@@ -8,7 +8,7 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'all',
+        path: 'list',
         children: [
           {
             path: '',
@@ -18,17 +18,7 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'grid',
-        children: [
-          {
-            path: '',
-            loadChildren: () =>
-              import('../spice-grid/spice-grid.module').then(m => m.SpiceGridPageModule)
-          }
-        ]
-      },
-      {
-        path: 'new',
+        path: 'templates',
         children: [
           {
             path: '',
@@ -39,14 +29,14 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/tabs/all',
+        redirectTo: '/tabs/list',
         pathMatch: 'full'
       }
     ]
   },
   {
     path: '',
-    redirectTo: '/tabs/all',
+    redirectTo: '/tabs/list',
     pathMatch: 'full'
   }
 ];

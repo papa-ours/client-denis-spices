@@ -1,30 +1,17 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar *ngIf="width>=650; else smallscreen">
     <ion-title>Les épices à Denis</ion-title>
-    <ion-buttons *ngIf="width>=650" slot="end">
-      <ion-button (click)="changePage(-1)" [disabled]="currentPage===0">
-        <ion-icon slot="icon-only" name="caret-back-circle"></ion-icon>
-      </ion-button>
-      <ion-text>
-        <p>{{(currentPage + 1) + '/' + pageCount}}</p>
-      </ion-text>
-      <ion-button (click)="changePage(1)" [disabled]="(currentPage + 1)===pageCount">
-        <ion-icon slot="icon-only" name="caret-forward-circle"></ion-icon>
-      </ion-button>
-
-      <ion-badge color="tertiary" mode="ios">{{numberOfSelectedSpices}}</ion-badge>
-      <ion-button color="primary" (click)="showPrintPage()">
-        <ion-icon slot="icon-only" name="print"></ion-icon>
-      </ion-button>
-      <ion-button color="primary" (click)="showFilterOptions()">
-        <ion-icon slot="icon-only" name="funnel"></ion-icon>
-      </ion-button>
-      <ion-button color="primary" (click)="addSpice()">
-        <ion-icon slot="icon-only" name="add-circle"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    <ng-container *ngTemplateOutlet="toolbar"></ng-container>
   </ion-toolbar>
-  <ion-toolbar *ngIf="width<650">
+  <ng-template #smallscreen>
+    <ion-toolbar>
+      <ion-title>Les épices à Denis</ion-title>
+    </ion-toolbar>
+    <ion-toolbar>
+      <ng-container *ngTemplateOutlet="toolbar"></ng-container>
+    </ion-toolbar>
+  </ng-template>
+  <ng-template #toolbar>
     <ion-buttons slot="end">
       <ion-button (click)="changePage(-1)" [disabled]="currentPage===0">
         <ion-icon slot="icon-only" name="caret-back-circle"></ion-icon>
@@ -35,8 +22,7 @@
       <ion-button (click)="changePage(1)" [disabled]="(currentPage + 1)===pageCount">
         <ion-icon slot="icon-only" name="caret-forward-circle"></ion-icon>
       </ion-button>
-
-      <ion-badge color="tertiary" mode="ios">{{numberOfSelectedSpices}}</ion-badge>
+      <ion-badge color="tertiary" mode="ios">{{getNumberOfSelectedSpices(spices)}}</ion-badge>
       <ion-button color="primary" (click)="showPrintPage()">
         <ion-icon slot="icon-only" name="print"></ion-icon>
       </ion-button>
@@ -47,8 +33,10 @@
         <ion-icon slot="icon-only" name="add-circle"></ion-icon>
       </ion-button>
     </ion-buttons>
-  </ion-toolbar>
+  </ng-template>
 </ion-header>
+
+
 <ion-content>
   <ion-grid fixed>
     <ion-row>
@@ -56,8 +44,8 @@
       <ion-col size-md="12" size-sm="12" size-xs="12">
         <ion-text (click)="showFilterOptions()" color="primary" id="filter">{{filterService.prettyFilter}}</ion-text>
         <ion-item class="ion-no-padding">
-          <ion-item id="select-all" (click)="allSelected ? setAll(false) : setAll(true)">
-            <ion-checkbox slot="start" [checked]="allSelected"></ion-checkbox>
+          <ion-item id="select-all" (click)="setAll(!getAllSelected(activeSpices))">
+            <ion-checkbox slot="start" [checked]="getAllSelected(activeSpices)"></ion-checkbox>
           </ion-item>
           <ion-label class="ion-margin-start" class="sortable" [class.sort]="sortColumn === 'label'" (click)="setSort('label')">
             Nom
@@ -69,18 +57,18 @@
             <ion-icon *ngIf="sortColumn === 'type' && sortDirection === -1" name="caret-down"></ion-icon>
             <ion-icon *ngIf="sortColumn === 'type' && sortDirection === 1" name="caret-up"></ion-icon>
           </ion-label>
-          <ion-label class="sortable" [class.sort]="sortColumn === 'printed'" (click)="setSort('printed')">
+          <!-- <ion-label class="sortable" [class.sort]="sortColumn === 'printed'" (click)="setSort('printed')">
             Imprimé
             <ion-icon *ngIf="sortColumn === 'printed' && sortDirection === -1" name="caret-down"></ion-icon>
             <ion-icon *ngIf="sortColumn === 'printed' && sortDirection === 1" name="caret-up"></ion-icon>
-          </ion-label>
+          </ion-label> -->
         </ion-item>
         <ion-list>
           <ion-item *ngIf="!spices.length">
             <ion-spinner *ngIf="loading" name="lines"></ion-spinner>
             <ion-label>{{loading ? ' Veuillez patienter' : 'Aucune épice ne correspond à ce filtre'}}</ion-label>
           </ion-item>
-          <app-spice-item *ngFor="let spice of activeSpices; let ind=index"
+          <app-spice-item *ngFor="let spice of activeSpices.slice(this.currentPage * this.SPICE_PER_PAGE, this.currentPage * this.SPICE_PER_PAGE + this.SPICE_PER_PAGE); let ind=index"
             [label]="spice.label"
             [type]="spice.type"
             [selected]="spice.selected"
@@ -88,7 +76,7 @@
             [_id]="spice._id" 
             [expirationDate]="spice.expirationDate"
             [spicyLevel]="spice.spicyLevel"
-            (click)="spice.selected=!spice.selected"
+            (selectEvent)="setSpiceSelected(spice, !spice.selected)"
             (editEvent)="getSpices()">
           </app-spice-item>
         </ion-list>

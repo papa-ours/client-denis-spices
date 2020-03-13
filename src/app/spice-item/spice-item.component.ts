@@ -22,10 +22,12 @@ export class SpiceItemComponent implements OnInit, Spice {
   @Input() public _id: string;
   @Input() public selected: boolean;
   @Output() public editEvent: EventEmitter<void>;
+  @Output() public selectEvent: EventEmitter<void>;
   public imageSource: string;
 
   public constructor(private service: SpiceService, private alertCtrl: AlertController, private modalCtrl: ModalController) {
     this.editEvent = new EventEmitter<void>();
+    this.selectEvent = new EventEmitter<void>();
   }
 
   public ngOnInit(): void {

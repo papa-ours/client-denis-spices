@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Spice } from '../spice';
 import { SpiceService } from '../spice.service';
 import { Router, NavigationEnd } from '@angular/router';
@@ -53,6 +53,11 @@ export class Tab1Page implements OnInit {
     );
   }
 
+  @HostListener('window:resize', ['$event'])
+  public onResize(): void {
+    this.width = this.platform.width();
+  }
+
   public initPages(): void {
     this.currentPage = 0;
     this.getPageCount();
@@ -70,8 +75,6 @@ export class Tab1Page implements OnInit {
     if (this.currentPage < 0) {
       this.currentPage = 0;
     }
-
-    this.setActiveSpices();
   }
 
   public setSort(column: string): void {
@@ -94,7 +97,7 @@ export class Tab1Page implements OnInit {
   }
 
   private sortSpices(): void {
-    this.spices.sort((spice1: Spice, spice2: Spice) => {
+    this.activeSpices.sort((spice1: Spice, spice2: Spice) => {
       const val1: string = (this.sortColumn === 'label' ? spice1.label : this.sortColumn === 'printed' ? spice1.printed.toString() : spice1.type.label).replace('É', 'E');
       const val2: string = (this.sortColumn === 'label' ? spice2.label : this.sortColumn === 'printed' ? spice2.printed.toString() : spice2.type.label).replace('É', 'E');
 
@@ -104,7 +107,6 @@ export class Tab1Page implements OnInit {
         return val1 < val2 ? -1 : 1 ;
       }
     });
-    this.setActiveSpices();
   }
 
   public async addSpice(): Promise<void> {
@@ -127,26 +129,35 @@ export class Tab1Page implements OnInit {
     }
   }
 
+  public setSelectedToNewSpices(spices: Spice[]): void {
+    spices.forEach((spice: Spice) => {
+      const oldSpice: Spice | undefined = this.spices.find((s: Spice) => s._id === spice._id);
+      if (oldSpice) {
+        spice.selected = oldSpice.selected;
+      }
+    });
+  }
+
   public getSpices(): void {
-    this.spices = [];
     this.loading = true;
     this.service.getSpices().subscribe((spices: Spice[]) => {
-      const oldSpices: Spice[] = this.spices;
-      this.spices = spices;
-      this.spices.forEach((spice: Spice) => {
-        const oldSpice: Spice | undefined = oldSpices.find((s: Spice) => s.label === spice.label);
-        if (oldSpice) {
-          spice.selected = oldSpice.selected;
-        }
-      });
+      if (!this.spices.length) {
+        this.spices = spices;
+      } else {
+        this.setSelectedToNewSpices(spices);
+      }
+
       this.sortSpices();
-      this.setActiveSpices();
+      this.setActiveSpices(spices);
       this.loading = false;
     });
   }
 
-  public setActiveSpices(): void {
-    this.activeSpices = this.spices.slice(this.currentPage * this.SPICE_PER_PAGE, this.currentPage * this.SPICE_PER_PAGE + this.SPICE_PER_PAGE);
+  public setActiveSpices(spices?: Spice[]): void {
+    if (spices) {
+      this.activeSpices = spices;
+    }
+    this.sortSpices();
   }
 
   public async showFilterOptions(): Promise<void> {
@@ -162,7 +173,7 @@ export class Tab1Page implements OnInit {
   }
 
   public async showPrintPage(): Promise<void> {
-    if (!this.numberOfSelectedSpices) {
+    if (!this.getNumberOfSelectedSpices(this.spices)) {
       this.showToast("Vous devez sélectionner au moins une épice.");
       return;
     }
@@ -170,29 +181,39 @@ export class Tab1Page implements OnInit {
     const modal = await this.modalCtrl.create({
       component: PrintComponent,
       componentProps: {
-        spices: this.selectedSpices,
+        spices: this.getSelectedSpices(this.spices),
       },
     });
     await modal.present();
+    await modal.onDidDismiss();
+    this.getSpices();
   }
 
   public goToAddView(): void {
     this.router.navigateByUrl("/tabs/new");
   }
 
-  public get allSelected(): boolean {
-    return this.spices.length > 0 && this.numberOfSelectedSpices === this.spices.length;
+  public getAllSelected(spices: Spice[]): boolean {
+    return this.activeSpices.length > 0 && this.getNumberOfSelectedSpices(this.activeSpices) === this.activeSpices.length;
   }
 
-  public get numberOfSelectedSpices(): number {
-    return this.selectedSpices.length;
+  public getNumberOfSelectedSpices(spices: Spice[]): number {
+    return this.getSelectedSpices(spices).length;
   }
 
-  public get selectedSpices(): Spice[] {
-    return this.spices.filter((spice: Spice) => spice.selected);
+  public getSelectedSpices(spices: Spice[]): Spice[] {
+    return spices.filter((spice: Spice) => spice.selected);
   }
 
   public setAll(selected: boolean): void {
-    this.spices.forEach((spice: Spice) => spice.selected = selected);
+    this.activeSpices.forEach((spice: Spice) => this.setSpiceSelected(spice, selected));
+  }
+
+  public setSpiceSelected(selectedSpice: Spice, value: boolean): void {
+    const spiceFromActiveSpices: Spice = this.activeSpices.find((spice: Spice) => spice._id === selectedSpice._id);
+    spiceFromActiveSpices.selected = value;
+
+    const spiceFromSpices: Spice = this.spices.find((spice: Spice) => spice._id === selectedSpice._id);
+    spiceFromSpices.selected = value;
   }
 }
