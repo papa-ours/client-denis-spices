@@ -9,6 +9,7 @@ export interface TemplateParams {
     fontSize: Param;
     rowCount: Param;
     colCount: Param;
+    numberOfItems: Param;
     leftPadding: Param;
     topPadding: Param;
     itemLeftDistance: Param;
@@ -16,6 +17,7 @@ export interface TemplateParams {
     itemWidth: Param;
     itemHeight: Param;
     imageSize: Param;
+    labelWidth: Param;
     labelOffsetX: Param;
     labelOffsetY: Param;
     imageOffsetX: Param;

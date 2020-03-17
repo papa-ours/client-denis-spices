@@ -23,6 +23,7 @@ export class Tab2Page implements OnInit {
       "name",
       "rowCount",
       "colCount",
+      "numberOfItems",
       "leftPadding",
       "topPadding",
       "itemLeftDistance",
@@ -32,6 +33,7 @@ export class Tab2Page implements OnInit {
     ], 
     [
       "fontSize",
+      "labelWidth",
       "labelOffsetX",
       "labelOffsetY",
       "imageSize",
@@ -162,7 +164,7 @@ export class Tab2Page implements OnInit {
         this.previewData = (await this.rectangleGenerator.generate(this.getMockSpices(), this.p5, 0, this.params))[0];
       }
     } catch (error) {
-      console.error(error.message);
+      console.error(error);
     }
     this.loading = false;
     this.ready = true;

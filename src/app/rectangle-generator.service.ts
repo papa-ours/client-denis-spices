@@ -24,7 +24,6 @@ export class RectangleGeneratorService {
   public qualityWarning: boolean;
   public shape: number;
   public spices: Spice[];
-  public numberOfImages: number;
   
   constructor(
     private sanitizer: DomSanitizer,
@@ -38,7 +37,6 @@ export class RectangleGeneratorService {
     this.currentPage = 0;
     this.previewData = [];
     this.qualityWarning = false;
-    this.numberOfImages = 3;
   }
   
   public get max(): number {
@@ -184,7 +182,7 @@ export class RectangleGeneratorService {
     this.p5.rectMode(this.p5.CENTER);
     this.p5.textSize(label.length > 30 ? 10 : label.length > 20 ? 12 : 14);
     this.p5.textAlign(this.p5.CENTER, this.p5.CENTER);
-    const maxWidth: number = this.params.itemWidth.value / this.numberOfImages;
+    const maxWidth: number = this.params.itemWidth.value / this.params.numberOfItems.value;
     this.p5.text(label, pos.x, pos.y + (this.params.imageSize.value / 2 + 15), maxWidth, maxWidth);
     this.p5.text(label, pos.x, pos.y - (this.params.imageSize.value / 2 + 15), maxWidth, maxWidth);
   }
@@ -228,15 +226,16 @@ export class RectangleGeneratorService {
       this.drawExpirationDate(pos, spice.expirationDate);
     }
 
-    for (let i = 0; i < this.numberOfImages; i++) {
-      const itemPos: {x: number, y: number} = {x: pos.x + (i - 1) * this.params.itemWidth.value / this.numberOfImages, y: pos.y};
+    for (let i = 0; i < this.params.numberOfItems.value; i++) {
+      let offset: number = (i - Math.floor(this.params.numberOfItems.value / 2)) + (this.params.numberOfItems.value % 2 ? 0 : 0.5);
+      const itemPos: {x: number, y: number} = {x: pos.x + offset * this.params.itemWidth.value / this.params.numberOfItems.value, y: pos.y};
       await this.drawImage(itemPos, spice._id);
       await this.drawLabel(itemPos, spice.label);
     }
 
     if (spice.type.value === 6 && spice.spicyLevel) {
-      for (let i = 0; i < this.numberOfImages - 1; i++) {
-        const itemPos: {x: number, y: number} = {x: pos.x + Math.pow(-1, i) * this.params.itemWidth.value / (this.numberOfImages * 2), y: pos.y};
+      for (let i = 0; i < this.params.numberOfItems.value - 1; i++) {
+        const itemPos: {x: number, y: number} = {x: pos.x + Math.pow(-1, i) * this.params.itemWidth.value / (this.params.numberOfItems.value * 2), y: pos.y};
         await this.drawSpicyLevel(itemPos, spice.spicyLevel);
       }
     }

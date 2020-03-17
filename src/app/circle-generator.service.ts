@@ -202,8 +202,7 @@ export class CircleGeneratorService {
     const fontSizeRatio: number = label.length > 30 ? 0.7 : label.length > 20 ? 0.85 : 1
     this.p5.textSize(fontSizeRatio * this.params.fontSize.value);
     this.p5.textAlign(this.p5.CENTER, this.p5.CENTER);
-    const textYPosition: number = imageAdded ? pos.y - this.params.itemHeight.value / 6 : pos.y;
-    this.p5.text(label, pos.x + this.params.labelOffsetX.value, textYPosition + this.params.labelOffsetY.value, this.params.itemWidth.value - 30, this.params.itemHeight.value - 30);
+    this.p5.text(label, pos.x + this.params.labelOffsetX.value, pos.y + this.params.labelOffsetY.value, this.params.labelWidth.value, 100);
   }
 
   private async drawSpice(spice: Spice, index: number): Promise<void> {
