@@ -30,7 +30,7 @@
     "dom-to-image-more": "^2.8.0",
     "dom2img": "0.0.0",
     "domtoimg": "^1.0.5",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "html2canvas": "^1.0.0-rc.5",
     "jspdf": "^1.5.3",
     "ngx-datatable": "^1.0.3",
